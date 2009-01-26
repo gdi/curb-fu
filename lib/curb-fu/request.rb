@@ -66,6 +66,7 @@ module CurbFu
         params.each do |name, value|
           value_string = value if value.is_a?(String)
           value_string = value.join(',') if value.is_a?(Array)
+          value_string ||= value.to_s
           
           fields << Curl::PostField.content(name,value_string)
         end
