@@ -30,12 +30,32 @@ describe CurbFu::Request do
   end
   
   describe "post" do
-    it "should be able to post stuff successfully" # do
-     #      response = CurbFu::Request.post(
-     #        {:host => "google.com", :port => 80, :path => "/search"},
-     #        { 'q' => 'derek' })
-     #      
-     #      puts (class << response; self; end).ancestors.join(", ")
-     #    end
+    it "should send each parameter to Curb#http_post" do
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah')
+      Curl::Easy.stub!(:new).and_return(@mock_curb)
+      @mock_q = Curl::PostField.content('q','derek')
+      @mock_r = Curl::PostField.content('r','matt')
+      Curl::PostField.stub!(:content).with('q','derek').and_return(@mock_q)
+      Curl::PostField.stub!(:content).with('r','matt').and_return(@mock_r)
+      
+      @mock_curb.should_receive(:http_post).with(@mock_q,@mock_r)
+      
+      response = CurbFu::Request.post(
+        {:host => "google.com", :port => 80, :path => "/search"},
+        { 'q' => 'derek', 'r' => 'matt' })
+    end
+    
+    it "should handle params that contain arrays" do
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah')
+      Curl::Easy.stub!(:new).and_return(@mock_curb)
+      @mock_q = Curl::PostField.content('q','derek,matt')
+      Curl::PostField.stub!(:content).with('q','derek,matt').and_return(@mock_q)
+      
+      @mock_curb.should_receive(:http_post).with(@mock_q)
+      
+      response = CurbFu::Request.post(
+        {:host => "google.com", :port => 80, :path => "/search"},
+        { 'q' => ['derek','matt'] })
+    end
   end
 end

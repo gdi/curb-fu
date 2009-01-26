@@ -29,10 +29,7 @@ module CurbFu
       end
       
       def put(url, params)
-        fields = []
-        params.each do |name, value|
-          fields << Curl::PostField.content(name,value)
-        end
+        fields = create_fields(params)
         
         curb = self.build(url)
         curb.http_put(*fields)
@@ -40,10 +37,7 @@ module CurbFu
       end
       
       def post(url, params = {})
-        fields = []
-        params.each do |name, value|
-          fields << Curl::PostField.content(name,value)
-        end
+        fields = create_fields(params)
         
         curb = self.build(url)
         curb.headers["Expect:"] = ''
@@ -52,13 +46,8 @@ module CurbFu
       end
       
       def post_file(url, params = {}, filez = {})
-        fields = []
-        params.each do |name, value|
-          fields << Curl::PostField.content(name,value)
-        end
-        filez.each do |name, path|
-          fields << Curl::PostField.file(name, path)
-        end
+        fields = create_fields(params)
+        fields += create_fields(filez)
         
         curb = self.build(url)
         curb.multipart_form_post = true
@@ -70,6 +59,17 @@ module CurbFu
         curb = self.build(url)
         curb.http_delete
         CurbFu::Response::Base.create(curb)
+      end
+      
+      def create_fields(params)
+        fields = []
+        params.each do |name, value|
+          value_string = value if value.is_a?(String)
+          value_string = value.join(',') if value.is_a?(Array)
+          
+          fields << Curl::PostField.content(name,value_string)
+        end
+        return fields
       end
     end
   end
