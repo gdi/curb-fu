@@ -8,6 +8,26 @@ module CurbFu
         @body = curb.body_str
       end
       
+      def success?
+        self.is_a?(CurbFu::Response::Success)
+      end
+      
+      def redirect?
+        self.is_a?(CurbFu::Response::Redirection)
+      end
+      
+      def failure?
+        !(success? || redirect?)
+      end
+      
+      def server_fail?
+        self.is_a?(CurbFu::Response::ServerError)
+      end
+      
+      def client_fail?
+        self.is_a?(CurbFu::Response::ClientError)
+      end
+      
       def self.create(curb)
         response = self.new(curb)
 
