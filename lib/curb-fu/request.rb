@@ -47,7 +47,7 @@ module CurbFu
       
       def post_file(url, params = {}, filez = {})
         fields = create_fields(params)
-        fields += create_fields(filez)
+        fields += create_file_fields(filez)
         
         curb = self.build(url)
         curb.multipart_form_post = true
@@ -71,6 +71,14 @@ module CurbFu
           fields << Curl::PostField.content(name,value_string)
         end
         return fields
+      end
+      
+      def create_file_fields(filez)
+        fields = []
+        filez.each do |name, path|
+          fields << Curl::PostField.file(name, path)
+        end
+        fields
       end
     end
   end
