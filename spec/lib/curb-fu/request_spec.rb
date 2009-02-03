@@ -31,7 +31,7 @@ describe CurbFu::Request do
   
   describe "post" do
     it "should send each parameter to Curb#http_post" do
-      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah')
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah', :timeout= => nil)
       Curl::Easy.stub!(:new).and_return(@mock_curb)
       @mock_q = Curl::PostField.content('q','derek')
       @mock_r = Curl::PostField.content('r','matt')
@@ -46,7 +46,7 @@ describe CurbFu::Request do
     end
     
     it "should handle params that contain arrays" do
-      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah')
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah', :timeout= => nil)
       Curl::Easy.stub!(:new).and_return(@mock_curb)
       @mock_q = Curl::PostField.content('q','derek,matt')
       Curl::PostField.stub!(:content).with('q','derek,matt').and_return(@mock_q)
@@ -59,7 +59,7 @@ describe CurbFu::Request do
     end
     
     it "should handle params that contain any non-Array or non-String data" do
-      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah')
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah', :timeout= => nil)
       Curl::Easy.stub!(:new).and_return(@mock_curb)
       @mock_q = Curl::PostField.content('q','1')
       Curl::PostField.stub!(:content).with('q','1').and_return(@mock_q)

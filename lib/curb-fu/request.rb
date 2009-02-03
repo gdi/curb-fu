@@ -4,6 +4,14 @@ require 'curb'
 module CurbFu
   class Request
     class << self
+      def timeout=(val)
+        @timeout = val
+      end
+      
+      def timeout
+        @timeout.nil? ? 60 : @timeout
+      end
+      
       def build(params)
         if params.is_a? String
           built_url = params
@@ -19,6 +27,9 @@ module CurbFu
           curb.userpwd = "#{params[:username]}:#{params[:password]}" if params[:username]
           curb.headers = params[:headers] || {}
         end
+        
+        curb.timeout = @timeout
+        
         curb
       end
       
