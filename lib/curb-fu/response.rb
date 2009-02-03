@@ -1,11 +1,12 @@
 module CurbFu
   module Response
     class Base
-      attr_accessor :status, :body
+      attr_accessor :status, :body, :headers
       
       def initialize(curb)
         @status = curb.response_code
         @body = curb.body_str
+        @headers = curb.headers
       end
       
       def success?
