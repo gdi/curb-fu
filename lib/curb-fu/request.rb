@@ -13,16 +13,9 @@ module CurbFu
       end
       
       def build(params)
-        if params.is_a? String
-          built_url = params
-        else
-          built_url = 'http://'
-          built_url += params[:host]
-          built_url += ":" + params[:port].to_s if params[:port]
-          built_url += params[:path] || ""
-        end
         
-        curb = Curl::Easy.new(built_url)
+        
+        curb = Curl::Easy.new(build_url(params))
         unless params.is_a?(String)
           curb.userpwd = "#{params[:username]}:#{params[:password]}" if params[:username]
           curb.headers = params[:headers] || {}
@@ -31,6 +24,18 @@ module CurbFu
         curb.timeout = @timeout
         
         curb
+      end
+      
+      def build_url(params)
+        if params.is_a? String
+          return params
+        else
+          built_url = "http://#{params[:host]}"
+          built_url += ":" + params[:port].to_s if params[:port]
+          built_url += params[:path] if params[:path]
+          
+          return built_url
+        end
       end
       
       def get(url)
