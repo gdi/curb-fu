@@ -6,7 +6,7 @@ module CurbFu
       def initialize(curb)
         @status = curb.response_code
         @body = curb.body_str
-        @headers = curb.headers
+        @headers = parse_headers(curb.header_str)
       end
       
       def success?
@@ -27,6 +27,16 @@ module CurbFu
       
       def client_fail?
         self.is_a?(CurbFu::Response::ClientError)
+      end
+      
+      def parse_headers(header_string)
+        header_lines = header_string.split($/)
+        header_lines.shift
+        header_lines.inject({}) do |hsh, line|
+          whole_enchillada, key, value = /^(.*?):\s*(.*)$/.match(line.chomp).to_a
+          hsh[key] = value unless whole_enchillada.nil?
+          hsh
+        end
       end
       
       def self.create(curb)
