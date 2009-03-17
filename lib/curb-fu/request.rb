@@ -13,8 +13,6 @@ module CurbFu
       end
       
       def build(params)
-        
-        
         curb = Curl::Easy.new(build_url(params))
         unless params.is_a?(String)
           curb.userpwd = "#{params[:username]}:#{params[:password]}" if params[:username]
