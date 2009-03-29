@@ -102,7 +102,6 @@ module CurbFu
           when 503 then response.extend CurbFu::Response::ServiceUnavailable
           when 504 then response.extend CurbFu::Response::GatewayTimeOut
           when 505 then response.extend CurbFu::Response::VersionNotSupported
->>>>>>> overwriting with fixes for 1.9 compatibility:lib/curb-fu/response.rb
           end
         else
           response.extend CurbFu::Response::UnknownResponse

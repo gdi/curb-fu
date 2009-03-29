@@ -4,7 +4,7 @@ require 'htmlentities'
 describe CurbFu::Response::Base do
   describe "successes" do
     it "should create a success (200) response" do
-      mock_curb = mock(Object, :response_code => 200, :body_str => 'OK')
+      mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => "")
       r = CurbFu::Response::Base.create(mock_curb)
       r.should be_a_kind_of(CurbFu::Response::Base)
       r.should be_a_kind_of(CurbFu::Response::Success)
@@ -12,7 +12,7 @@ describe CurbFu::Response::Base do
       r.should_not be_a_kind_of(CurbFu::Response::Created)
     end
     it "should create a success (201) response" do
-      mock_curb = mock(Object, :response_code => 201, :body_str => 'OK')
+      mock_curb = mock(Object, :response_code => 201, :body_str => 'OK', :header_str => "")
       r = CurbFu::Response::Base.create(mock_curb)
       r.should be_a_kind_of(CurbFu::Response::Base)
       r.should be_a_kind_of(CurbFu::Response::Success)
