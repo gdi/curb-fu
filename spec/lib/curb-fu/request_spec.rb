@@ -2,6 +2,23 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 require 'htmlentities'
 
 describe CurbFu::Request do
+  describe "build_url" do
+    it "should return a string if a string parameter is given" do
+      CurbFu::Request.build_url("http://www.cliffsofinsanity.com").should == "http://www.cliffsofinsanity.com"
+    end
+    it "should return a built url with just a hostname if only the hostname is given" do
+      CurbFu::Request.build_url(:host => "poisonedwine.com").should == "http://poisonedwine.com"
+    end
+    it "should return a built url with hostname and port if port is also given" do
+      CurbFu::Request.build_url(:host => "www2.giantthrowingrocks.com", :port => 8080).
+        should == "http://www2.giantthrowingrocks.com:8080"
+    end
+    it "should return a built url with hostname, port, and path if all are given" do
+      CurbFu::Request.build_url(:host => "spookygiantburningmonk.org", :port => 3000, :path => '/standing/in/a/wheelbarrow.aspx').
+        should == "http://spookygiantburningmonk.org:3000/standing/in/a/wheelbarrow.aspx"
+    end
+  end
+  
   describe "get" do
     it "should get the google" do
       CurbFu::Request.get("http://www.google.com").should be_a_kind_of(CurbFu::Response::OK)
@@ -31,7 +48,7 @@ describe CurbFu::Request do
   
   describe "post" do
     it "should send each parameter to Curb#http_post" do
-      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah')
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil)
       Curl::Easy.stub!(:new).and_return(@mock_curb)
       @mock_q = Curl::PostField.content('q','derek')
       @mock_r = Curl::PostField.content('r','matt')
@@ -46,7 +63,7 @@ describe CurbFu::Request do
     end
     
     it "should handle params that contain arrays" do
-      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah')
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil)
       Curl::Easy.stub!(:new).and_return(@mock_curb)
       @mock_q = Curl::PostField.content('q','derek,matt')
       Curl::PostField.stub!(:content).with('q','derek,matt').and_return(@mock_q)
@@ -59,7 +76,7 @@ describe CurbFu::Request do
     end
     
     it "should handle params that contain any non-Array or non-String data" do
-      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :response_code => 200, :body_str => 'yeeeah')
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil)
       Curl::Easy.stub!(:new).and_return(@mock_curb)
       @mock_q = Curl::PostField.content('q','1')
       Curl::PostField.stub!(:content).with('q','1').and_return(@mock_q)
