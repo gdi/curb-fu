@@ -6,6 +6,17 @@ require 'rake/rdoctask'
 require 'spec'
 require 'spec/rake/spectask'
 
+gemspec = nil
+File.open(File.join(File.dirname(__FILE__), 'curb-fu.gemspec')) do |f|
+  eval("gemspec = #{f.read}")
+end
+
+Rake::GemPackageTask.new(gemspec) do |pkg|
+  pkg.need_zip = true
+  pkg.need_tar = true
+end
+
+
 Spec::Rake::SpecTask.new do |t|
   ENV["cluster_env"] ||= "test"
   t.warning = false
