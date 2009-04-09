@@ -6,14 +6,6 @@ require 'rake/rdoctask'
 require 'spec'
 require 'spec/rake/spectask'
 
-Rake::GemPackageTask.new(spec) do |pkg|
-    pkg.need_tar = true
-end
-
-task :default => "pkg/#{spec.name}-#{spec.version}.gem" do
-    puts "generated latest version"
-end
-
 Spec::Rake::SpecTask.new do |t|
   ENV["cluster_env"] ||= "test"
   t.warning = false
