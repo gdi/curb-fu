@@ -54,7 +54,7 @@ describe CurbFu::Request do
     it "should append parameters to the url" do
       @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
       Curl::Easy.should_receive(:new).with('http://www.google.com?search=MSU vs UNC&limit=200').and_return(@mock_curb)
-      CurbFu::Request.get(:host => 'www.google.com', :query_params => { :search => 'MSU vs UNC', :limit => 200 })
+      CurbFu::Request.get({ :host => 'www.google.com' }, { :search => 'MSU vs UNC', :limit => 200 })
     end
   end
 
