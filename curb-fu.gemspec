@@ -9,6 +9,6 @@ spec = Gem::Specification.new do |s|
     s.require_path  =   "lib"
     s.test_files = Dir.glob('spec/**/*') + Dir.glob('stories/**/*')
     s.has_rdoc  =   false
-    s.add_dependency('curb',   '>= 0.1.4')
+    s.add_dependency('taf2-curb',   '>= 0.2.8.0')
 end
 
