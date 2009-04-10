@@ -111,12 +111,7 @@ describe CurbFu::Request do
     end
 
     it "should send each parameter to Curb#http_post" do
-      @mock_q = Curl::PostField.content('q','derek')
-      @mock_r = Curl::PostField.content('r','matt')
-      Curl::PostField.stub!(:content).with('q','derek').and_return(@mock_q)
-      Curl::PostField.stub!(:content).with('r','matt').and_return(@mock_r)
-
-      @mock_curb.should_receive(:http_put).with(@mock_q,@mock_r)
+      @mock_curb.should_receive(:http_put).with("q=derek","r=matt")
 
       response = CurbFu::Request.put(
         {:host => "google.com", :port => 80, :path => "/search"},
@@ -124,10 +119,7 @@ describe CurbFu::Request do
     end
 
     it "should handle params that contain arrays" do
-      @mock_q = Curl::PostField.content('q','derek,matt')
-      Curl::PostField.stub!(:content).with('q','derek,matt').and_return(@mock_q)
-
-      @mock_curb.should_receive(:http_put).with(@mock_q)
+      @mock_curb.should_receive(:http_put).with("q=derek,matt")
 
       response = CurbFu::Request.put(
         {:host => "google.com", :port => 80, :path => "/search"},
@@ -135,10 +127,7 @@ describe CurbFu::Request do
     end
 
     it "should handle params that contain any non-Array or non-String data" do
-      @mock_q = Curl::PostField.content('q','1')
-      Curl::PostField.stub!(:content).with('q','1').and_return(@mock_q)
-
-      @mock_curb.should_receive(:http_put).with(@mock_q)
+      @mock_curb.should_receive(:http_put).with("q=1")
 
       response = CurbFu::Request.put(
         {:host => "google.com", :port => 80, :path => "/search"},

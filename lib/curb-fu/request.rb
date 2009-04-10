@@ -48,7 +48,10 @@ module CurbFu
       end
 
       def put(url, params = {})
-        fields = create_fields(params)
+        fields = params.collect do |k,v|
+          v = v.is_a?(Array) ? v.join(',') : v
+          "#{k}=#{v}"
+        end
 
         curb = self.build(url)
         curb.http_put(*fields) if fields.length
