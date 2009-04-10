@@ -54,7 +54,7 @@ module CurbFu
         end
 
         curb = self.build(url)
-        curb.http_put(*fields) if fields.length
+        curb.http_put(*fields)
         CurbFu::Response::Base.create(curb)
       end
 
@@ -63,7 +63,7 @@ module CurbFu
 
         curb = self.build(url)
         curb.headers["Expect:"] = ''
-        curb.http_post(*fields) if fields.length
+        curb.http_post(*fields)
         CurbFu::Response::Base.create(curb)
       end
 
