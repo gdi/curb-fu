@@ -47,7 +47,7 @@ module CurbFu
         CurbFu::Response::Base.create(curb)
       end
 
-      def put(url)
+      def put(url, params = {})
         fields = create_fields(params)
 
         curb = self.build(url)
@@ -55,7 +55,7 @@ module CurbFu
         CurbFu::Response::Base.create(curb)
       end
 
-      def post(url)
+      def post(url, params = {})
         fields = create_fields(params)
 
         curb = self.build(url)
