@@ -40,6 +40,11 @@ describe CurbFu::Request do
       CurbFu::Request.get("http://www.google.com/ponies_and_pirates").status.should == 404
       CurbFu::Request.get("http://www.google.com/ponies_and_pirates").should be_a_kind_of(CurbFu::Response::NotFound)
     end
+    it "should append query parameters" do
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
+      Curl::Easy.should_receive(:new).with('http://www.google.com?search=MSU vs UNC&limit=200').and_return(@mock_curb)
+      CurbFu::Request.get('http://www.google.com', { :search => 'MSU vs UNC', :limit => 200 })
+    end
   end
 
   describe "get (with_hash)" do
