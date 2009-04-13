@@ -17,12 +17,23 @@ describe CurbFu::Request do
       CurbFu::Request.build_url(:host => "spookygiantburningmonk.org", :port => 3000, :path => '/standing/in/a/wheelbarrow.aspx').
         should == "http://spookygiantburningmonk.org:3000/standing/in/a/wheelbarrow.aspx"
     end
+    it 'should append a query string if a query params hash is given' do
+      CurbFu::Request.build_url('http://navyseals.mil', :swim_speed => '2knots').
+        should == 'http://navyseals.mil?swim_speed=2knots'
+    end
+    it 'should append a query string if a query string is given' do
+      CurbFu::Request.build_url('http://chocolatecheese.com','?nuts=true').
+        should == 'http://chocolatecheese.com?nuts=true'
+    end
   end
 
   describe "build_query_string" do
     it 'should build a query string' do
       params = { 'foo' => 'bar', 'rat' => 'race' }
       CurbFu::Request.build_query_string(params).should == '?foo=bar&rat=race'
+    end
+    it 'should return an empty string if params is an empty hash' do
+      CurbFu::Request.build_query_string({}).should == ''
     end
   end
 
