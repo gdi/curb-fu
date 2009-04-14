@@ -16,6 +16,12 @@ module CurbFu
         curb = Curl::Easy.new(build_url(url_params, query_params))
         unless url_params.is_a?(String)
           curb.userpwd = "#{url_params[:username]}:#{url_params[:password]}" if url_params[:username]
+          if url_params[:authtype]
+            curb.http_auth_types = url_params[:authtype]
+          elsif url_params[:username]
+            curb.http_auth_types = CurbFu::Authentication::BASIC
+          end
+
           curb.headers = url_params[:headers] || {}
         end
 
