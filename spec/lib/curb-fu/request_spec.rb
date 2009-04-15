@@ -1,6 +1,18 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 require 'htmlentities'
 
+def regex_for_url_with_params(url, *params)
+  regex = '^' + url.gsub('/','\/').gsub('.','\.')
+  regex += '\?' unless params.empty?
+
+  unless params.empty?
+    param_possibilities = params.join('|')
+    regex += params.inject([]) { |list, param| list << "(#{param_possibilities})" }.join('&')
+  end
+  regex += '$'
+  Regexp.new(regex)
+end
+
 describe CurbFu::Request do
   describe "build_url" do
     it "should return a string if a string parameter is given" do
@@ -30,10 +42,8 @@ describe CurbFu::Request do
   describe "build_query_string" do
     it 'should build a query string' do
       params = { 'foo' => 'bar', 'rat' => 'race' }
-      url = CurbFu::Request.build_query_string(params).should
-      url.should =~ /^\?.+=.+&.+=.+$/
-      url.should =~ /foo=bar/
-      url.should =~ /rat=race/
+      url = CurbFu::Request.build_query_string(params)
+      url.should =~ regex_for_url_with_params('', 'foo=bar', 'rat=race')
     end
     it 'should return an empty string if params is an empty hash' do
       CurbFu::Request.build_query_string({}).should == ''
@@ -56,7 +66,7 @@ describe CurbFu::Request do
     end
     it "should append query parameters" do
       @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
-      Curl::Easy.should_receive(:new).with('http://www.google.com?search=MSU vs UNC&limit=200').and_return(@mock_curb)
+      Curl::Easy.should_receive(:new).with(regex_for_url_with_params('http://www.google.com', 'search=MSU vs UNC', 'limit=200')).and_return(@mock_curb)
       CurbFu::Request.get('http://www.google.com', { :search => 'MSU vs UNC', :limit => 200 })
     end
 
