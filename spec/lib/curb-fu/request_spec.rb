@@ -30,7 +30,10 @@ describe CurbFu::Request do
   describe "build_query_string" do
     it 'should build a query string' do
       params = { 'foo' => 'bar', 'rat' => 'race' }
-      CurbFu::Request.build_query_string(params).should == '?foo=bar&rat=race'
+      url = CurbFu::Request.build_query_string(params).should
+      url.should =~ /^\?.+=.+&.+=.+$/
+      url.should =~ /foo=bar/
+      url.should =~ /rat=race/
     end
     it 'should return an empty string if params is an empty hash' do
       CurbFu::Request.build_query_string({}).should == ''
