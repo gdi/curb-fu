@@ -6,6 +6,8 @@ require 'rake/rdoctask'
 require 'spec'
 require 'spec/rake/spectask'
 
+require 'dependent/rake/dependent_task'
+
 gemspec = nil
 File.open(File.join(File.dirname(__FILE__), 'curb-fu.gemspec')) do |f|
   eval("gemspec = #{f.read}")
@@ -45,3 +47,5 @@ namespace :spec do
     require File.join('stories','all.rb')
   end
 end
+
+Dependent::Rake::DependentTask.new
