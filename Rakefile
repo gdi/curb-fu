@@ -1,12 +1,9 @@
 require 'rubygems'
 require 'rake/gempackagetask'
-require 'rake/testtask'
 require 'rake/rdoctask'
 
 require 'spec'
 require 'spec/rake/spectask'
-
-require 'dependent/rake/dependent_task'
 
 gemspec = nil
 File.open(File.join(File.dirname(__FILE__), 'curb-fu.gemspec')) do |f|
@@ -25,8 +22,6 @@ Spec::Rake::SpecTask.new do |t|
   t.spec_opts = ['--options', 'spec/spec.opts']
   unless ENV['NO_RCOV']
     t.spec_files = FileList['spec/**/*.rb']
-    #t.rcov = true
-    #t.rcov_opts = ['--exclude', 'rspec,spec,stories']
   end
 end
 
@@ -38,14 +33,3 @@ namespace :gem do
     system("gem install #{`ls pkg/*.gem`}")
   end
 end
-
-#Rake::Task[:spec].enhance [:reset_memcached]
-
-namespace :spec do
-  desc "Run story runner"
-  task :stories do
-    require File.join('stories','all.rb')
-  end
-end
-
-Dependent::Rake::DependentTask.new
