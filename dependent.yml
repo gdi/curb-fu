@@ -1,0 +1,8 @@
+--- 
+dependents:
+  - super-cluster
+  - client-interface
+  - data-store
+  - jobs
+  - coremon
+  - solr-utils 
