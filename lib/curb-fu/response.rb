@@ -112,12 +112,12 @@ module CurbFu
     end
           
     module Information; end
-      module Continue; end
+      module Continue;                           def self.to_i; 100; end; end
       module SwitchProtocl; end
-      module Success; end
-      module OK; end
-      module Created; end
-      module Accepted; end
+    module Success; end
+      module OK;                                 def self.to_i; 200; end; end
+      module Created;                            def self.to_i; 201; end; end
+      module Accepted;                           def self.to_i; 202; end; end
       module NonAuthoritativeInformation; end
       module NoContent; end
       module ResetContent; end
@@ -125,7 +125,7 @@ module CurbFu
     module Redirection; end                    # 3xx
       module MultipleChoice; end                 # 300
       module MovedPermanently; end               # 301
-      module Found; end                          # 302
+      module Found;                              def self.to_i; 302; end; end
       module SeeOther; end                       # 303
       module NotModified; end                    # 304
       module UseProxy; end                       # 305
@@ -135,13 +135,13 @@ module CurbFu
       module Unauthorized; end                   # 401
       module PaymentRequired; end                # 402
       module Forbidden; end                      # 403
-      module NotFound; end                       # 404
+      module NotFound;                           def self.to_i; 404; end; end
       module MethodNotAllowed; end               # 405
       module NotAcceptable; end                  # 406
       module ProxyAuthenticationRequired; end    # 407
       module RequestTimeOut; end                 # 408
       module Conflict; end                       # 409
-      module Gone; end                           # 410
+      module Gone;                               def self.to_i; 410; end; end
       module LengthRequired; end                 # 411
       module PreconditionFailed; end             # 412
       module RequestEntityTooLarge; end          # 413
@@ -150,10 +150,10 @@ module CurbFu
       module RequestedRangeNotSatisfiable; end   # 416
       module ExpectationFailed; end              # 417
     module ServerError; end                    # 5xx
-      module InternalServerError; end            # 500
+      module InternalServerError;                def self.to_i; 500; end; end
       module NotImplemented; end                 # 501
       module BadGateway; end                     # 502
-      module ServiceUnavailable; end             # 503
+      module ServiceUnavailable;                 def self.to_i; 503; end; end
       module GatewayTimeOut; end                 # 504
       module VersionNotSupported; end            # 505
     module UnknownResponse; end

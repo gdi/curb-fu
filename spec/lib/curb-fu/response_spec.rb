@@ -32,6 +32,15 @@ describe CurbFu::Response::Base do
     r.should be_a_kind_of(CurbFu::Response::ServerError)
   end
   
+  describe "response modules" do
+    describe "to_i" do
+      it "should return the status code represented by the module" do
+        CurbFu::Response::OK.to_i.should == 200
+        CurbFu::Response::NotFound.to_i.should == 404
+      end
+    end
+  end
+  
   describe "parse_headers" do
     before(:each) do
     end
