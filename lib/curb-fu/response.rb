@@ -114,7 +114,7 @@ module CurbFu
     module Information; end
       module Continue;                           def self.to_i; 100; end; end
       module SwitchProtocl; end
-    module Success; end
+    module Success;                              def self.to_i; 200; end; end
       module OK;                                 def self.to_i; 200; end; end
       module Created;                            def self.to_i; 201; end; end
       module Accepted;                           def self.to_i; 202; end; end
