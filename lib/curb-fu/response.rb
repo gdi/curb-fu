@@ -3,10 +3,11 @@ module CurbFu
     class Base
       attr_accessor :status, :body, :headers
       
-      def initialize(curb)
-        @status = curb.response_code
-        @body = curb.body_str
-        @headers = parse_headers(curb.header_str)
+      def initialize(status, headers, body)
+        @status = status
+        set_response_type(status)
+        @body = body
+        @headers = headers.is_a?(String) ? parse_headers(headers) : headers
       end
       
       def success?
@@ -39,75 +40,83 @@ module CurbFu
         end
       end
       
-      def self.create(curb)
-        response = self.new(curb)
-
-        case response.status
+      def set_response_type(status)
+        case status
         when 100..199 then
-          response.extend CurbFu::Response::Information
-          case response.status
-          when 101 then response.extend CurbFu::Response::Continue
-          when 102 then response.extend CurbFu::Response::SwitchProtocl
+          self.extend CurbFu::Response::Information
+          case self.status
+          when 101 then self.extend CurbFu::Response::Continue
+          when 102 then self.extend CurbFu::Response::SwitchProtocl
           end
         when 200..299 then
-          response.extend CurbFu::Response::Success
-          case response.status
-          when 200 then response.extend CurbFu::Response::OK
-          when 201 then response.extend CurbFu::Response::Created
-          when 202 then response.extend CurbFu::Response::Accepted
-          when 203 then response.extend CurbFu::Response::NonAuthoritativeInformation
-          when 204 then response.extend CurbFu::Response::NoContent
-          when 205 then response.extend CurbFu::Response::ResetContent
-          when 206 then response.extend CurbFu::Response::PartialContent
+          self.extend CurbFu::Response::Success
+          case self.status
+          when 200 then self.extend CurbFu::Response::OK
+          when 201 then self.extend CurbFu::Response::Created
+          when 202 then self.extend CurbFu::Response::Accepted
+          when 203 then self.extend CurbFu::Response::NonAuthoritativeInformation
+          when 204 then self.extend CurbFu::Response::NoContent
+          when 205 then self.extend CurbFu::Response::ResetContent
+          when 206 then self.extend CurbFu::Response::PartialContent
           end
         when 300..399 then
-          response.extend CurbFu::Response::Redirection
-          case response.status
-          when 300 then response.extend CurbFu::Response::MultipleChoice
-          when 301 then response.extend CurbFu::Response::MovedPermanently
-          when 302 then response.extend CurbFu::Response::Found
-          when 303 then response.extend CurbFu::Response::SeeOther
-          when 304 then response.extend CurbFu::Response::NotModified
-          when 305 then response.extend CurbFu::Response::UseProxy
-          when 307 then response.extend CurbFu::Response::TemporaryRedirect
+          self.extend CurbFu::Response::Redirection
+          case self.status
+          when 300 then self.extend CurbFu::Response::MultipleChoice
+          when 301 then self.extend CurbFu::Response::MovedPermanently
+          when 302 then self.extend CurbFu::Response::Found
+          when 303 then self.extend CurbFu::Response::SeeOther
+          when 304 then self.extend CurbFu::Response::NotModified
+          when 305 then self.extend CurbFu::Response::UseProxy
+          when 307 then self.extend CurbFu::Response::TemporaryRedirect
           end
         when 400..499 then
-          response.extend CurbFu::Response::ClientError
-          case response.status
-          when 400 then response.extend CurbFu::Response::BadRequest
-          when 401 then response.extend CurbFu::Response::Unauthorized
-          when 402 then response.extend CurbFu::Response::PaymentRequired
-          when 403 then response.extend CurbFu::Response::Forbidden
-          when 404 then response.extend CurbFu::Response::NotFound
-          when 405 then response.extend CurbFu::Response::MethodNotAllowed
-          when 406 then response.extend CurbFu::Response::NotAcceptable
-          when 407 then response.extend CurbFu::Response::ProxyAuthenticationRequired
-          when 408 then response.extend CurbFu::Response::RequestTimeOut
-          when 409 then response.extend CurbFu::Response::Conflict
-          when 410 then response.extend CurbFu::Response::Gone
-          when 411 then response.extend CurbFu::Response::LengthRequired
-          when 412 then response.extend CurbFu::Response::PreconditionFailed
-          when 413 then response.extend CurbFu::Response::RequestEntityTooLarge
-          when 414 then response.extend CurbFu::Response::RequestURITooLong
-          when 415 then response.extend CurbFu::Response::UnsupportedMediaType
-          when 416 then response.extend CurbFu::Response::UnsupportedMediaType
-          when 417 then response.extend CurbFu::Response::ExpectationFailed
+          self.extend CurbFu::Response::ClientError
+          case self.status
+          when 400 then self.extend CurbFu::Response::BadRequest
+          when 401 then self.extend CurbFu::Response::Unauthorized
+          when 402 then self.extend CurbFu::Response::PaymentRequired
+          when 403 then self.extend CurbFu::Response::Forbidden
+          when 404 then self.extend CurbFu::Response::NotFound
+          when 405 then self.extend CurbFu::Response::MethodNotAllowed
+          when 406 then self.extend CurbFu::Response::NotAcceptable
+          when 407 then self.extend CurbFu::Response::ProxyAuthenticationRequired
+          when 408 then self.extend CurbFu::Response::RequestTimeOut
+          when 409 then self.extend CurbFu::Response::Conflict
+          when 410 then self.extend CurbFu::Response::Gone
+          when 411 then self.extend CurbFu::Response::LengthRequired
+          when 412 then self.extend CurbFu::Response::PreconditionFailed
+          when 413 then self.extend CurbFu::Response::RequestEntityTooLarge
+          when 414 then self.extend CurbFu::Response::RequestURITooLong
+          when 415 then self.extend CurbFu::Response::UnsupportedMediaType
+          when 416 then self.extend CurbFu::Response::UnsupportedMediaType
+          when 417 then self.extend CurbFu::Response::ExpectationFailed
           end
         when 500..599 then
-          response.extend CurbFu::Response::ServerError
-          case response.status
-          when 500 then response.extend CurbFu::Response::InternalServerError
-          when 501 then response.extend CurbFu::Response::NotImplemented
-          when 502 then response.extend CurbFu::Response::BadGateway
-          when 503 then response.extend CurbFu::Response::ServiceUnavailable
-          when 504 then response.extend CurbFu::Response::GatewayTimeOut
-          when 505 then response.extend CurbFu::Response::VersionNotSupported
+          self.extend CurbFu::Response::ServerError
+          case self.status
+          when 500 then self.extend CurbFu::Response::InternalServerError
+          when 501 then self.extend CurbFu::Response::NotImplemented
+          when 502 then self.extend CurbFu::Response::BadGateway
+          when 503 then self.extend CurbFu::Response::ServiceUnavailable
+          when 504 then self.extend CurbFu::Response::GatewayTimeOut
+          when 505 then self.extend CurbFu::Response::VersionNotSupported
           end
         else
-          response.extend CurbFu::Response::UnknownResponse
+          self.extend CurbFu::Response::UnknownResponse
         end
-        
-        response
+      end
+      
+      class << self
+        def from_rack_response(rack)
+          raise ArgumentError.new("Rack response may not be nil") if rack.nil?
+          response = self.new(rack.status, rack.headers, rack.body)
+        end
+      
+        def from_curb_response(curb)
+          response = self.new(curb.response_code, curb.header_str, curb.body_str)
+          response
+        end
       end
     end
           

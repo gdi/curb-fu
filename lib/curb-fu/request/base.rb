@@ -52,7 +52,7 @@ module CurbFu
       def get(url, params = {})
         curb = self.build(url, params)
         curb.http_get
-        CurbFu::Response::Base.create(curb)
+        CurbFu::Response::Base.from_curb_response(curb)
       end
 
       def put(url, params = {})
@@ -63,7 +63,7 @@ module CurbFu
 
         curb = self.build(url)
         curb.http_put(*fields)
-        CurbFu::Response::Base.create(curb)
+        CurbFu::Response::Base.from_curb_response(curb)
       end
 
       def post(url, params = {})
@@ -72,7 +72,7 @@ module CurbFu
         curb = self.build(url)
         curb.headers["Expect:"] = ''
         curb.http_post(*fields)
-        CurbFu::Response::Base.create(curb)
+        CurbFu::Response::Base.from_curb_response(curb)
       end
 
       def post_file(url, params = {}, filez = {})
@@ -82,13 +82,13 @@ module CurbFu
         curb = self.build(url)
         curb.multipart_form_post = true
         curb.http_post(*fields)
-        CurbFu::Response::Base.create(curb)
+        CurbFu::Response::Base.from_curb_response(curb)
       end
 
       def delete(url)
         curb = self.build(url)
         curb.http_delete
-        CurbFu::Response::Base.create(curb)
+        CurbFu::Response::Base.from_curb_response(curb)
       end
 
       def create_fields(params)
