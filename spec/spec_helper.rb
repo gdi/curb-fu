@@ -1,5 +1,6 @@
 require "rubygems"
 require 'spec'
+require 'htmlentities'
 
 dir = File.dirname(__FILE__)
 lib_path = File.expand_path(File.join(dir,'..','lib'))
