@@ -1,5 +1,4 @@
-require File.dirname(__FILE__) + '/../../spec_helper'
-require 'htmlentities'
+require File.dirname(__FILE__) + '/../../../spec_helper'
 
 def regex_for_url_with_params(url, *params)
   regex = '^' + url.gsub('/','\/').gsub('.','\.')
@@ -13,28 +12,32 @@ def regex_for_url_with_params(url, *params)
   Regexp.new(regex)
 end
 
-describe CurbFu::Request do
+class TestHarness
+  extend CurbFu::Request::Base
+end
+
+describe CurbFu::Request::Base do
   describe "build_url" do
     it "should return a string if a string parameter is given" do
-      CurbFu::Request.build_url("http://www.cliffsofinsanity.com").should == "http://www.cliffsofinsanity.com"
+      TestHarness.build_url("http://www.cliffsofinsanity.com").should == "http://www.cliffsofinsanity.com"
     end
     it "should return a built url with just a hostname if only the hostname is given" do
-      CurbFu::Request.build_url(:host => "poisonedwine.com").should == "http://poisonedwine.com"
+      TestHarness.build_url(:host => "poisonedwine.com").should == "http://poisonedwine.com"
     end
     it "should return a built url with hostname and port if port is also given" do
-      CurbFu::Request.build_url(:host => "www2.giantthrowingrocks.com", :port => 8080).
+      TestHarness.build_url(:host => "www2.giantthrowingrocks.com", :port => 8080).
         should == "http://www2.giantthrowingrocks.com:8080"
     end
     it "should return a built url with hostname, port, and path if all are given" do
-      CurbFu::Request.build_url(:host => "spookygiantburningmonk.org", :port => 3000, :path => '/standing/in/a/wheelbarrow.aspx').
+      TestHarness.build_url(:host => "spookygiantburningmonk.org", :port => 3000, :path => '/standing/in/a/wheelbarrow.aspx').
         should == "http://spookygiantburningmonk.org:3000/standing/in/a/wheelbarrow.aspx"
     end
     it 'should append a query string if a query params hash is given' do
-      CurbFu::Request.build_url('http://navyseals.mil', :swim_speed => '2knots').
+      TestHarness.build_url('http://navyseals.mil', :swim_speed => '2knots').
         should == 'http://navyseals.mil?swim_speed=2knots'
     end
     it 'should append a query string if a query string is given' do
-      CurbFu::Request.build_url('http://chocolatecheese.com','?nuts=true').
+      TestHarness.build_url('http://chocolatecheese.com','?nuts=true').
         should == 'http://chocolatecheese.com?nuts=true'
     end
   end
@@ -42,47 +45,47 @@ describe CurbFu::Request do
   describe "build_query_string" do
     it 'should build a query string' do
       params = { 'foo' => 'bar', 'rat' => 'race' }
-      url = CurbFu::Request.build_query_string(params)
+      url = TestHarness.build_query_string(params)
       url.should =~ regex_for_url_with_params('', 'foo=bar', 'rat=race')
     end
     it 'should return an empty string if params is an empty hash' do
-      CurbFu::Request.build_query_string({}).should == ''
+      TestHarness.build_query_string({}).should == ''
     end
   end
 
   describe "get" do
     it "should get the google" do
-      CurbFu::Request.get("http://www.google.com").should be_a_kind_of(CurbFu::Response::OK)
+      TestHarness.get("http://www.google.com").should be_a_kind_of(CurbFu::Response::OK)
     end
     it "should return a status code" do
-      CurbFu::Request.get("http://www.google.com").status.should == 200
+      TestHarness.get("http://www.google.com").status.should == 200
     end
     it "should return a body" do
-      CurbFu::Request.get("http://www.google.com").body.should =~ /html/
+      TestHarness.get("http://www.google.com").body.should =~ /html/
     end
     it "should return a 404 code correctly" do
-      CurbFu::Request.get("http://www.google.com/ponies_and_pirates").status.should == 404
-      CurbFu::Request.get("http://www.google.com/ponies_and_pirates").should be_a_kind_of(CurbFu::Response::NotFound)
+      TestHarness.get("http://www.google.com/ponies_and_pirates").status.should == 404
+      TestHarness.get("http://www.google.com/ponies_and_pirates").should be_a_kind_of(CurbFu::Response::NotFound)
     end
     it "should append query parameters" do
       @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
       Curl::Easy.should_receive(:new).with(regex_for_url_with_params('http://www.google.com', 'search=MSU vs UNC', 'limit=200')).and_return(@mock_curb)
-      CurbFu::Request.get('http://www.google.com', { :search => 'MSU vs UNC', :limit => 200 })
+      TestHarness.get('http://www.google.com', { :search => 'MSU vs UNC', :limit => 200 })
     end
 
     describe "with_hash" do
       it "should get google from {:host => \"www.google.com\", :port => 80}" do
-        CurbFu::Request.get({:host => "www.google.com", :port => 80}).should be_a_kind_of(CurbFu::Response::OK)
+        TestHarness.get({:host => "www.google.com", :port => 80}).should be_a_kind_of(CurbFu::Response::OK)
       end
 
       it "should set authorization username and password if provided" do
-        CurbFu::Request.get({:host => "control.greenviewdata.com", :port => 80, :username => "archiver", :password => "test"}).
+        TestHarness.get({:host => "control.greenviewdata.com", :port => 80, :username => "archiver", :password => "test"}).
           should be_a_kind_of(CurbFu::Response::OK)
       end
       it "should append parameters to the url" do
         @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
         Curl::Easy.should_receive(:new).with(regex_for_url_with_params('http://www.google.com', 'search=MSU vs UNC', 'limit=200')).and_return(@mock_curb)
-        CurbFu::Request.get({ :host => 'www.google.com' }, { :search => 'MSU vs UNC', :limit => 200 })
+        TestHarness.get({ :host => 'www.google.com' }, { :search => 'MSU vs UNC', :limit => 200 })
       end
     end
   end
@@ -101,7 +104,7 @@ describe CurbFu::Request do
 
       @mock_curb.should_receive(:http_post).with(@mock_q,@mock_r)
 
-      response = CurbFu::Request.post(
+      response = TestHarness.post(
         {:host => "google.com", :port => 80, :path => "/search"},
         { 'q' => 'derek', 'r' => 'matt' })
     end
@@ -112,7 +115,7 @@ describe CurbFu::Request do
 
       @mock_curb.should_receive(:http_post).with(@mock_q)
 
-      response = CurbFu::Request.post(
+      response = TestHarness.post(
         {:host => "google.com", :port => 80, :path => "/search"},
         { 'q' => ['derek','matt'] })
     end
@@ -123,7 +126,7 @@ describe CurbFu::Request do
 
       @mock_curb.should_receive(:http_post).with(@mock_q)
 
-      response = CurbFu::Request.post(
+      response = TestHarness.post(
         {:host => "google.com", :port => 80, :path => "/search"},
         { 'q' => 1 })
     end
@@ -138,7 +141,7 @@ describe CurbFu::Request do
     it "should send each parameter to Curb#http_post" do
       @mock_curb.should_receive(:http_put).with("q=derek","r=matt")
 
-      response = CurbFu::Request.put(
+      response = TestHarness.put(
         {:host => "google.com", :port => 80, :path => "/search"},
         { 'q' => 'derek', 'r' => 'matt' })
     end
@@ -146,7 +149,7 @@ describe CurbFu::Request do
     it "should handle params that contain arrays" do
       @mock_curb.should_receive(:http_put).with("q=derek,matt")
 
-      response = CurbFu::Request.put(
+      response = TestHarness.put(
         {:host => "google.com", :port => 80, :path => "/search"},
         { 'q' => ['derek','matt'] })
     end
@@ -154,7 +157,7 @@ describe CurbFu::Request do
     it "should handle params that contain any non-Array or non-String data" do
       @mock_curb.should_receive(:http_put).with("q=1")
 
-      response = CurbFu::Request.put(
+      response = TestHarness.put(
         {:host => "google.com", :port => 80, :path => "/search"},
         { 'q' => 1 })
     end

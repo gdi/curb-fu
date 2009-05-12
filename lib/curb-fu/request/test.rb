@@ -10,54 +10,44 @@ module CurbFu
     
       module ClassMethods
         def get(url, params = {})
-          host = parse_hostname(url)
-          interface = match_host(host)
-          if interface.nil?
-            raise Curl::Err::ConnectionFailedError
-          else
-            interface.get(url, params)
-          end
+          host, interface = get_host_and_interface(url)
+          respond(interface, :get, url, params)
         end
         
         def post(url, params = {})
-          host = parse_hostname(url)
-          interface = match_host(host)
-          if interface.nil?
-            raise Curl::Err::ConnectionFailedError
-          else
-            interface.post(url, params)
-          end
+          host, interface = get_host_and_interface(url)
+          respond(interface, :post, url, params)
         end
         
         def post_file(url, params = {}, filez = {})
-          host = parse_hostname(url)
-          interface = match_host(host)
+          host, interface = get_host_and_interface(url)
           uploaded_files = filez.inject({}) { |hsh, f| hsh["file_#{hsh.keys.length}"] = Rack::Test::UploadedFile.new(f.last); hsh }
-          if interface.nil?
-            raise Curl::Err::ConnectionFailedError
-          else
-            interface.post(url, params.merge(uploaded_files))
-          end
+          respond(interface, :post, url, params.merge(uploaded_files))
         end
         
         def put(url, params = {})
-          host = parse_hostname(url)
-          interface = match_host(host)
-          if interface.nil?
-            raise Curl::Err::ConnectionFailedError
-          else
-            interface.put(url, params)
-          end
+          host, interface = get_host_and_interface(url)
+          respond(interface, :put, url, params)
         end
         
         def delete(url, params = {})
-          host = parse_hostname(url)
-          interface = match_host(host)
+          host, interface = get_host_and_interface(url)
+          respond(interface, :delete, url, params)
+        end
+        
+        def respond(interface, operation, url, params)
           if interface.nil?
             raise Curl::Err::ConnectionFailedError
           else
-            interface.delete(url, params)
+            response = interface.send(operation, url, params)
+            CurbFu::Response::Base.from_rack_response(response)
           end
+        end
+        
+        def get_host_and_interface(url)
+          host = parse_hostname(url)
+          interface = match_host(host)
+          [host, interface]
         end
         
         def parse_hostname(uri)
