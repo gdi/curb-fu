@@ -64,6 +64,18 @@ describe CurbFu::Request::Test do
       response.headers.should == { 'Content-Type' => 'spec/testcase' }
       response.body.should == "A is for Archer, an excellent typeface."
     end
+    it 'should accept a url that is a hash along with query params' do
+      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter?when=now')
+      CurbFu::Request.stub!(:respond)
+      
+      CurbFu::Request.get({ :host => 'a.example.com', :path => '/gimme/shelter' },{ :when => 'now' })
+    end
+    it 'should accept a url that is a hash and has no query params' do
+      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter')
+      CurbFu::Request.stub!(:respond)
+      
+      CurbFu::Request.get(:host => 'a.example.com', :path => '/gimme/shelter')
+    end
   end
   
   describe "post" do
@@ -84,6 +96,12 @@ describe CurbFu::Request::Test do
       response.headers.should == { 'Content-Type' => 'spec/testcase' }
       response.body.should == "A is for Archer, an excellent typeface."
     end
+    it 'should accept a url that is a hash' do
+      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter')
+      CurbFu::Request.stub!(:respond)
+      
+      CurbFu::Request.post(:host => 'a.example.com', :path => '/gimme/shelter')
+    end
   end
   
   describe "post_file" do
@@ -103,6 +121,12 @@ describe CurbFu::Request::Test do
       response.headers.should == { 'Content-Type' => 'spec/testcase' }
       response.body.should == "A is for Archer, an excellent typeface."
     end
+    it 'should accept a url that is a hash' do
+      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter')
+      CurbFu::Request.stub!(:respond)
+      
+      CurbFu::Request.post_file(:host => 'a.example.com', :path => '/gimme/shelter')
+    end
   end
   
   describe "put" do
@@ -119,6 +143,12 @@ describe CurbFu::Request::Test do
       response.status.should == 200
       response.headers.should == { 'Content-Type' => 'spec/testcase' }
       response.body.should == "A is for Archer, an excellent typeface."
+    end
+    it 'should accept a url that is a hash' do
+      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter')
+      CurbFu::Request.stub!(:respond)
+      
+      CurbFu::Request.put(:host => 'a.example.com', :path => '/gimme/shelter')
     end
   end
   
@@ -137,6 +167,12 @@ describe CurbFu::Request::Test do
       response.status.should == 200
       response.headers.should == { 'Content-Type' => 'spec/testcase' }
       response.body.should == "A is for Archer, an excellent typeface."
+    end
+    it 'should accept a url that is a hash' do
+      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter')
+      CurbFu::Request.stub!(:respond)
+      
+      CurbFu::Request.delete(:host => 'a.example.com', :path => '/gimme/shelter')
     end
   end
 end

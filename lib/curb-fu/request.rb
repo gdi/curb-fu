@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'curb'
+require 'curb-fu/request/common'
 require 'curb-fu/request/base'
 require 'curb-fu/request/test'
 

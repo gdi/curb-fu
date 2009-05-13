@@ -3,6 +3,8 @@ require 'rack/test'
 module CurbFu
   class Request
     module Test
+      include Common
+      
       def self.included(target)
         target.extend(ClassMethods)
       end
@@ -10,27 +12,32 @@ module CurbFu
     
       module ClassMethods
         def get(url, params = {})
+          url = build_url(url, params)
           host, interface = get_host_and_interface(url)
           respond(interface, :get, url, params)
         end
         
         def post(url, params = {})
+          url = build_url(url)
           host, interface = get_host_and_interface(url)
           respond(interface, :post, url, params)
         end
         
         def post_file(url, params = {}, filez = {})
+          url = build_url(url)
           host, interface = get_host_and_interface(url)
           uploaded_files = filez.inject({}) { |hsh, f| hsh["file_#{hsh.keys.length}"] = Rack::Test::UploadedFile.new(f.last); hsh }
           respond(interface, :post, url, params.merge(uploaded_files))
         end
         
         def put(url, params = {})
+          url = build_url(url)
           host, interface = get_host_and_interface(url)
           respond(interface, :put, url, params)
         end
         
         def delete(url, params = {})
+          url = build_url(url)
           host, interface = get_host_and_interface(url)
           respond(interface, :delete, url, params)
         end
@@ -45,7 +52,11 @@ module CurbFu
         end
         
         def get_host_and_interface(url)
-          host = parse_hostname(url)
+          if url.is_a?(Hash)
+            host = url[:hostname]
+          else
+            host = parse_hostname(url)
+          end
           interface = match_host(host)
           [host, interface]
         end
