@@ -76,6 +76,11 @@ describe CurbFu::Request::Test do
       
       CurbFu::Request.get(:host => 'a.example.com', :path => '/gimme/shelter')
     end
+    it 'should handle http authentication' do
+      CurbFu::Request.should_receive(:respond).with(anything, :get, 'http://a.example.com/gimme/shelter', {}, 'floyd', 'barber')
+      
+      CurbFu::Request.get(:host => 'a.example.com', :path => '/gimme/shelter', :username => 'floyd', :password => 'barber')
+    end
   end
   
   describe "post" do
