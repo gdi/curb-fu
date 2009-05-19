@@ -8,60 +8,79 @@ module CurbFu
       def self.included(target)
         target.extend(ClassMethods)
       end
-    
-    
+
       module ClassMethods
         def get(url, params = {})
-          url_string = build_url(url, params)
-          username, password = get_auth(url)
-          host, interface = get_host_and_interface(url_string)
-          
-          respond(interface, :get, url_string, params, username, password)
+          request_options = build_request_options(url)
+          respond(request_options[:interface], :get, request_options[:url],
+            params, request_options[:headers], request_options[:username], request_options[:password])
         end
         
         def post(url, params = {})
-          url_string = build_url(url)
-          host, interface = get_host_and_interface(url_string)
-          respond(interface, :post, url_string, params)
+          request_options = build_request_options(url)
+          respond(request_options[:interface], :post, request_options[:url],
+            params, request_options[:headers], request_options[:username], request_options[:password])
         end
         
         def post_file(url, params = {}, filez = {})
-          url_string = build_url(url)
-          host, interface = get_host_and_interface(url_string)
+          request_options = build_request_options(url)
           uploaded_files = filez.inject({}) { |hsh, f| hsh["file_#{hsh.keys.length}"] = Rack::Test::UploadedFile.new(f.last); hsh }
-          respond(interface, :post, url_string, params.merge(uploaded_files))
+          respond(request_options[:interface], :post, request_options[:url], 
+            params.merge(uploaded_files), request_options[:headers], request_options[:username], request_options[:password])
         end
         
         def put(url, params = {})
-          url_string = build_url(url)
-          host, interface = get_host_and_interface(url_string)
-          respond(interface, :put, url_string, params)
+          request_options = build_request_options(url)
+          respond(request_options[:interface], :put, request_options[:url],
+            params, request_options[:headers], request_options[:username], request_options[:password])
         end
         
         def delete(url, params = {})
-          url_string = build_url(url)
-          host, interface = get_host_and_interface(url_string)
-          respond(interface, :delete, url_string, params)
+          request_options = build_request_options(url)
+          respond(request_options[:interface], :delete, request_options[:url],
+            params, request_options[:headers], request_options[:username], request_options[:password])
         end
         
-        def respond(interface, operation, url, params, username = nil, password = nil)
+        def build_request_options(url)
+          options = {}
+          options[:headers] = (url.is_a?(String)) ? nil : url.delete(:headers)
+          options[:url] = build_url(url)
+          options[:username], options[:password] = get_auth(url)
+          options[:interface] = get_interface(url)
+          options
+        end
+        
+        def respond(interface, operation, url, params, headers, username = nil, password = nil)
           if interface.nil?
             raise Curl::Err::ConnectionFailedError
           else
+            unless headers.nil?
+              process_headers(headers).each do |name, value|
+                interface.header(name, value)
+              end
+            end
             interface.authorize(username, password) unless username.nil?
             response = interface.send(operation, url, params)
             CurbFu::Response::Base.from_rack_response(response)
           end
         end
         
-        def get_host_and_interface(url)
+        def process_headers(headers)
+          headers.inject({}) do |accum, (header_name, value)|
+            key = header_name.gsub("-", "_").upcase
+            key = "HTTP_" + key unless key =~ /^HTTP_/
+            accum[key] = value
+            accum
+          end
+        end
+        
+        def get_interface(url)
           if url.is_a?(Hash)
-            host = url[:hostname]
+            host = url[:host]
           else
             host = parse_hostname(url)
           end
-          interface = match_host(host)
-          [host, interface]
+          match_host(host)
         end
         
         def parse_hostname(uri)
@@ -70,7 +89,9 @@ module CurbFu
         end
         
         def match_host(host)
-          match = CurbFu.stubs.find { |(hostname, interface)| hostname == host }
+          match = CurbFu.stubs.find do |(hostname, interface)|
+            hostname == host
+          end
           match.last unless match.nil?
         end
         

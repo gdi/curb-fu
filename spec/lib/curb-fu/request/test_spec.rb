@@ -39,12 +39,69 @@ describe CurbFu::Request::Test do
     end
   end
   
+  describe "process_headers" do
+    it "should convert http headers into their upcased, HTTP_ prepended form for the Rack environment" do
+      CurbFu::Request.process_headers({'X-Mirror-Request' => 'true'}).should == {"HTTP_X_MIRROR_REQUEST" => "true"}
+    end
+    it "should handle a whole hashful of headers" do
+      CurbFu::Request.process_headers({
+        'X-Mirror-Request' => 'true',
+        'Accept-Encoding' => '*/*',
+        'X-Forwarded-For' => 'greenviewdata.com'
+      }).should == {
+        "HTTP_X_MIRROR_REQUEST" => "true",
+        "HTTP_ACCEPT_ENCODING" => "*/*",
+        "HTTP_X_FORWARDED_FOR" => "greenviewdata.com"
+      }
+    end
+  end
+  
   describe "match_host" do
     it "should return the appropriate Rack::Test instance to delegate the request to" do
       CurbFu::Request.match_host("a.example.com").app.should == @a_server
     end
     it "should return nil if no match is made" do
       CurbFu::Request.match_host("m.google.com").should be_nil
+    end
+  end
+  
+  describe "build_request_options" do
+    it "should parse headers" do
+      CurbFu::Request.build_request_options({:host => 'd.example.com', :path => '/big/white/dog', :headers => { 'Accept' => 'beer/pilsner' }}).
+        should include(:headers => { 'Accept' => 'beer/pilsner' })
+    end
+    it "should parse url" do
+      CurbFu::Request.build_request_options({:host => 'd.example.com', :path => '/big/white/dog'}).
+        should include(:url => 'http://d.example.com/big/white/dog')
+    end
+    it "should parse username and password" do
+      CurbFu::Request.build_request_options({:host => 'd.example.com', :path => '/big/white/dog', :username => 'bill', :password => 's3cr3t' }).
+        should include(:username => 'bill', :password => 's3cr3t')
+    end
+    it "should get an interface" do
+      CurbFu::Request.build_request_options({:host => 'c.example.com', :path => '/big/white/dog'}).
+        should include(:interface => CurbFu.stubs['c.example.com'])
+    end
+  end
+  
+  describe "get_interface" do
+    it "should parse a string" do
+      CurbFu::Request.get_interface('http://a.example.com').app.should == @a_server
+    end
+    it "should parse a hash" do
+      CurbFu::Request.get_interface({:host => 'a.example.com'}).app.should == @a_server
+    end
+  end
+  
+  describe "respond" do
+    it "should convert headers to uppercase, underscorized" do
+      CurbFu::Response::Base.stub!(:from_rack_response)
+      mock_interface = mock(Object, :send => mock(Object, :status => 200))
+      mock_interface.should_receive(:header).with('HTTP_X_MONARCHY','false')
+      mock_interface.should_receive(:header).with('HTTP_X_ANARCHO_SYNDICALIST_COMMUNE','true')
+      
+      CurbFu::Request.respond(mock_interface, :get, 'http://a.example.com/', {}, 
+        {'X-Anarcho-Syndicalist-Commune' => 'true', 'X-Monarchy' => 'false'}, nil, nil)
     end
   end
   
@@ -63,23 +120,6 @@ describe CurbFu::Request::Test do
       response.status.should == 200
       response.headers.should == { 'Content-Type' => 'spec/testcase' }
       response.body.should == "A is for Archer, an excellent typeface."
-    end
-    it 'should accept a url that is a hash along with query params' do
-      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter?when=now')
-      CurbFu::Request.stub!(:respond)
-      
-      CurbFu::Request.get({ :host => 'a.example.com', :path => '/gimme/shelter' },{ :when => 'now' })
-    end
-    it 'should accept a url that is a hash and has no query params' do
-      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter')
-      CurbFu::Request.stub!(:respond)
-      
-      CurbFu::Request.get(:host => 'a.example.com', :path => '/gimme/shelter')
-    end
-    it 'should handle http authentication' do
-      CurbFu::Request.should_receive(:respond).with(anything, :get, 'http://a.example.com/gimme/shelter', {}, 'floyd', 'barber')
-      
-      CurbFu::Request.get(:host => 'a.example.com', :path => '/gimme/shelter', :username => 'floyd', :password => 'barber')
     end
   end
   
@@ -101,12 +141,6 @@ describe CurbFu::Request::Test do
       response.headers.should == { 'Content-Type' => 'spec/testcase' }
       response.body.should == "A is for Archer, an excellent typeface."
     end
-    it 'should accept a url that is a hash' do
-      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter')
-      CurbFu::Request.stub!(:respond)
-      
-      CurbFu::Request.post(:host => 'a.example.com', :path => '/gimme/shelter')
-    end
   end
   
   describe "post_file" do
@@ -126,16 +160,10 @@ describe CurbFu::Request::Test do
       response.headers.should == { 'Content-Type' => 'spec/testcase' }
       response.body.should == "A is for Archer, an excellent typeface."
     end
-    it 'should accept a url that is a hash' do
-      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter')
-      CurbFu::Request.stub!(:respond)
-      
-      CurbFu::Request.post_file(:host => 'a.example.com', :path => '/gimme/shelter')
-    end
   end
   
   describe "put" do
-    it 'should delegate the get request to the Rack::Test instance' do
+    it 'should delegate the put request to the Rack::Test instance' do
       CurbFu.stubs['a.example.com'].should_receive(:put).with('http://a.example.com/gimme/html', anything).and_return(@mock_rack_response)
       CurbFu::Request.put('http://a.example.com/gimme/html')
     end
@@ -149,16 +177,10 @@ describe CurbFu::Request::Test do
       response.headers.should == { 'Content-Type' => 'spec/testcase' }
       response.body.should == "A is for Archer, an excellent typeface."
     end
-    it 'should accept a url that is a hash' do
-      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter')
-      CurbFu::Request.stub!(:respond)
-      
-      CurbFu::Request.put(:host => 'a.example.com', :path => '/gimme/shelter')
-    end
   end
   
   describe "delete" do
-    it 'should delegate the get request to the Rack::Test instance' do
+    it 'should delegate the delete request to the Rack::Test instance' do
       CurbFu.stubs['a.example.com'].should_receive(:delete).with('http://a.example.com/gimme/html', anything).and_return(@mock_rack_response)
       @a_server.should respond_to(:call)
       CurbFu::Request.delete('http://a.example.com/gimme/html')
@@ -172,12 +194,6 @@ describe CurbFu::Request::Test do
       response.status.should == 200
       response.headers.should == { 'Content-Type' => 'spec/testcase' }
       response.body.should == "A is for Archer, an excellent typeface."
-    end
-    it 'should accept a url that is a hash' do
-      CurbFu::Request.should_receive(:get_host_and_interface).with('http://a.example.com/gimme/shelter')
-      CurbFu::Request.stub!(:respond)
-      
-      CurbFu::Request.delete(:host => 'a.example.com', :path => '/gimme/shelter')
     end
   end
 end

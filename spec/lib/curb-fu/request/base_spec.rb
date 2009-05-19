@@ -42,17 +42,6 @@ describe CurbFu::Request::Base do
     end
   end
 
-  describe "build_query_string" do
-    it 'should build a query string' do
-      params = { 'foo' => 'bar', 'rat' => 'race' }
-      url = TestHarness.build_query_string(params)
-      url.should =~ regex_for_url_with_params('', 'foo=bar', 'rat=race')
-    end
-    it 'should return an empty string if params is an empty hash' do
-      TestHarness.build_query_string({}).should == ''
-    end
-  end
-
   describe "get" do
     it "should get the google" do
       TestHarness.get("http://www.google.com").should be_a_kind_of(CurbFu::Response::OK)
@@ -69,7 +58,7 @@ describe CurbFu::Request::Base do
     end
     it "should append query parameters" do
       @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
-      Curl::Easy.should_receive(:new).with(regex_for_url_with_params('http://www.google.com', 'search=MSU vs UNC', 'limit=200')).and_return(@mock_curb)
+      Curl::Easy.should_receive(:new).with(regex_for_url_with_params('http://www.google.com', 'search=MSU\+vs\+UNC', 'limit=200')).and_return(@mock_curb)
       TestHarness.get('http://www.google.com', { :search => 'MSU vs UNC', :limit => 200 })
     end
 
@@ -77,15 +66,15 @@ describe CurbFu::Request::Base do
       it "should get google from {:host => \"www.google.com\", :port => 80}" do
         TestHarness.get({:host => "www.google.com", :port => 80}).should be_a_kind_of(CurbFu::Response::OK)
       end
-
-    it "should set authorization username and password if provided" do
-      CurbFu::Request.get({:host => "secret.domain.com", :port => 80, :username => "agent", :password => "donttellanyone"}).
-        should be_a_kind_of(CurbFu::Response::OK)
-    end
-    it "should append parameters to the url" do
-      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
-      Curl::Easy.should_receive(:new).with('http://www.google.com?search=MSU vs UNC&limit=200').and_return(@mock_curb)
-      CurbFu::Request.get({ :host => 'www.google.com' }, { :search => 'MSU vs UNC', :limit => 200 })
+      it "should set authorization username and password if provided" do
+        TestHarness.get({:host => "secret.domain.com", :port => 80, :username => "agent", :password => "donttellanyone"}).
+          should be_a_kind_of(CurbFu::Response::OK)
+      end
+      it "should append parameters to the url" do
+        @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
+        Curl::Easy.should_receive(:new).with(regex_for_url_with_params('http://www.google.com', 'search=MSU\+vs\+UNC', 'limit=200')).and_return(@mock_curb)
+        TestHarness.get({ :host => 'www.google.com' }, { :search => 'MSU vs UNC', :limit => 200 })
+      end
     end
   end
 

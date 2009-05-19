@@ -3,6 +3,7 @@ $:.unshift(dir) unless $:.include?(dir)
 require 'curb-fu/response'
 require 'curb-fu/request'
 require 'curb-fu/authentication'
+require 'curb-fu/core_ext'
 
 module CurbFu
   class << self
