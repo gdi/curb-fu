@@ -14,6 +14,14 @@ end
 
 class TestHarness
   extend CurbFu::Request::Base
+  
+  def self.create_post_fields(*args)   # testing interface to private method #create_post_fields
+    super(*args)
+  end
+  
+  def self.create_put_fields(*args)   # testing interface to private method #create_put_fields
+    super(*args)
+  end
 end
 
 describe CurbFu::Request::Base do
@@ -44,17 +52,18 @@ describe CurbFu::Request::Base do
 
   describe "get" do
     it "should get the google" do
-      TestHarness.get("http://www.google.com").should be_a_kind_of(CurbFu::Response::OK)
-    end
-    it "should return a status code" do
-      TestHarness.get("http://www.google.com").status.should == 200
-    end
-    it "should return a body" do
-      TestHarness.get("http://www.google.com").body.should =~ /html/
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
+      Curl::Easy.should_receive(:new).with('http://www.google.com').and_return(@mock_curb)
+      
+      TestHarness.get("http://www.google.com")
     end
     it "should return a 404 code correctly" do
-      TestHarness.get("http://www.google.com/ponies_and_pirates").status.should == 404
-      TestHarness.get("http://www.google.com/ponies_and_pirates").should be_a_kind_of(CurbFu::Response::NotFound)
+      mock_curb = mock(Object, :http_get => nil)
+      TestHarness.stub!(:build).and_return(mock_curb)
+      mock_response = mock(CurbFu::Response::NotFound, :status => 404)
+      CurbFu::Response::Base.stub!(:from_curb_response).and_return(mock_response)
+      
+      TestHarness.get("http://www.google.com/ponies_and_pirates").should == mock_response
     end
     it "should append query parameters" do
       @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
@@ -64,9 +73,16 @@ describe CurbFu::Request::Base do
 
     describe "with_hash" do
       it "should get google from {:host => \"www.google.com\", :port => 80}" do
-        TestHarness.get({:host => "www.google.com", :port => 80}).should be_a_kind_of(CurbFu::Response::OK)
+        @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
+        Curl::Easy.should_receive(:new).with('http://www.google.com:80').and_return(@mock_curb)
+      
+        TestHarness.get({:host => "www.google.com", :port => 80})
       end
       it "should set authorization username and password if provided" do
+        @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
+        Curl::Easy.should_receive(:new).with(regex_for_url_with_params('http://www.google.com', 'search=MSU\+vs\+UNC', 'limit=200')).and_return(@mock_curb)
+        TestHarness.get('http://www.google.com', { :search => 'MSU vs UNC', :limit => 200 })
+      
         TestHarness.get({:host => "secret.domain.com", :port => 80, :username => "agent", :password => "donttellanyone"}).
           should be_a_kind_of(CurbFu::Response::OK)
       end
@@ -87,36 +103,13 @@ describe CurbFu::Request::Base do
     it "should send each parameter to Curb#http_post" do
       @mock_q = Curl::PostField.content('q','derek')
       @mock_r = Curl::PostField.content('r','matt')
-      Curl::PostField.stub!(:content).with('q','derek').and_return(@mock_q)
-      Curl::PostField.stub!(:content).with('r','matt').and_return(@mock_r)
+      TestHarness.stub!(:create_post_fields).and_return([@mock_q,@mock_r])
 
       @mock_curb.should_receive(:http_post).with(@mock_q,@mock_r)
 
       response = TestHarness.post(
         {:host => "google.com", :port => 80, :path => "/search"},
         { 'q' => 'derek', 'r' => 'matt' })
-    end
-
-    it "should handle params that contain arrays" do
-      @mock_q = Curl::PostField.content('q','derek,matt')
-      Curl::PostField.stub!(:content).with('q','derek,matt').and_return(@mock_q)
-
-      @mock_curb.should_receive(:http_post).with(@mock_q)
-
-      response = TestHarness.post(
-        {:host => "google.com", :port => 80, :path => "/search"},
-        { 'q' => ['derek','matt'] })
-    end
-
-    it "should handle params that contain any non-Array or non-String data" do
-      @mock_q = Curl::PostField.content('q','1')
-      Curl::PostField.stub!(:content).with('q','1').and_return(@mock_q)
-
-      @mock_curb.should_receive(:http_post).with(@mock_q)
-
-      response = TestHarness.post(
-        {:host => "google.com", :port => 80, :path => "/search"},
-        { 'q' => 1 })
     end
   end
 
@@ -126,28 +119,61 @@ describe CurbFu::Request::Base do
       Curl::Easy.stub!(:new).and_return(@mock_curb)
     end
 
-    it "should send each parameter to Curb#http_post" do
+    it "should send each parameter to Curb#http_put" do
+      TestHarness.stub!(:create_put_fields).and_return('q=derek','r=matt')
       @mock_curb.should_receive(:http_put).with("q=derek","r=matt")
 
       response = TestHarness.put(
         {:host => "google.com", :port => 80, :path => "/search"},
         { 'q' => 'derek', 'r' => 'matt' })
     end
-
+  end
+  
+  describe "create_post_fields" do
+    it "should return the params if params is a string" do
+      TestHarness.create_post_fields("my awesome data that I'm sending to you").
+        should == "my awesome data that I'm sending to you"
+    end
+    it "should convert hash items into Curl::PostFields" do
+      Curl::PostField.should_receive(:content).with(:us,'obama')
+      Curl::PostField.should_receive(:content).with(:de,'merkel')
+      TestHarness.create_post_fields(:us => 'obama', :de => 'merkel')
+    end
     it "should handle params that contain arrays" do
-      @mock_curb.should_receive(:http_put).with("q=derek,matt")
+      Curl::PostField.should_receive(:content).with('q','derek,matt')
 
-      response = TestHarness.put(
-        {:host => "google.com", :port => 80, :path => "/search"},
-        { 'q' => ['derek','matt'] })
+      TestHarness.create_post_fields('q' => ['derek','matt'])
+    end
+    it "should handle params that contain any non-Array or non-String data" do
+      Curl::PostField.should_receive(:content).with('q','1')
+
+      TestHarness.create_post_fields('q' => 1)
+    end
+    it "should return an array of Curl::PostFields" do
+      TestHarness.create_post_fields(:ice_cream => 'chocolate', :beverage => 'water').each do |field|
+        field.should be_a_kind_of(Curl::PostField)
+      end
+    end
+  end
+  
+  describe "create_put_fields" do
+    it "should return the params if params is a string" do
+      TestHarness.create_put_fields("my awesome data that I'm sending to you").
+        should == "my awesome data that I'm sending to you"
+    end
+    
+    it 'should handle multiple parameters' do
+      TestHarness.create_put_fields(:rock => 'beatles', :rap => '2pac').
+        should == "rock=beatles&rap=2pac"
+    end
+    
+    it "should handle params that contain arrays" do
+      TestHarness.create_put_fields('q' => ['derek','matt']).
+        should == "q=derek,matt"
     end
 
     it "should handle params that contain any non-Array or non-String data" do
-      @mock_curb.should_receive(:http_put).with("q=1")
-
-      response = TestHarness.put(
-        {:host => "google.com", :port => 80, :path => "/search"},
-        { 'q' => 1 })
+      TestHarness.create_put_fields('q' => 1).should == "q=1"
     end
   end
 end

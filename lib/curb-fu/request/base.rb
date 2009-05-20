@@ -28,18 +28,15 @@ module CurbFu
       end
 
       def put(url, params = {})
-        fields = params.collect do |k,v|
-          v = v.is_a?(Array) ? v.join(',') : v
-          "#{k}=#{v}"
-        end
+        fields = create_put_fields(params)
 
         curb = self.build(url)
-        curb.http_put(*fields)
+        curb.http_put(fields)
         CurbFu::Response::Base.from_curb_response(curb)
       end
 
       def post(url, params = {})
-        fields = create_fields(params)
+        fields = create_post_fields(params)
 
         curb = self.build(url)
         curb.headers["Expect:"] = ''
@@ -48,7 +45,7 @@ module CurbFu
       end
 
       def post_file(url, params = {}, filez = {})
-        fields = create_fields(params)
+        fields = create_post_fields(params)
         fields += create_file_fields(filez)
 
         curb = self.build(url)
@@ -63,7 +60,10 @@ module CurbFu
         CurbFu::Response::Base.from_curb_response(curb)
       end
 
-      def create_fields(params)
+    private
+      def create_post_fields(params)
+        return params if params.is_a? String
+        
         fields = []
         params.each do |name, value|
           value_string = value if value.is_a?(String)
@@ -73,6 +73,15 @@ module CurbFu
           fields << Curl::PostField.content(name,value_string)
         end
         return fields
+      end
+      
+      def create_put_fields(params)
+        return params if params.is_a? String
+        
+        params.collect do |k,v|
+          v = v.is_a?(Array) ? v.join(',') : v
+          "#{k}=#{v}"
+        end
       end
 
       def create_file_fields(filez)
