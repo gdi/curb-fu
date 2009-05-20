@@ -79,12 +79,11 @@ describe CurbFu::Request::Base do
         TestHarness.get({:host => "www.google.com", :port => 80})
       end
       it "should set authorization username and password if provided" do
-        @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
-        Curl::Easy.should_receive(:new).with(regex_for_url_with_params('http://www.google.com', 'search=MSU\+vs\+UNC', 'limit=200')).and_return(@mock_curb)
-        TestHarness.get('http://www.google.com', { :search => 'MSU vs UNC', :limit => 200 })
+        @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil, :http_auth_types= => nil)
+        Curl::Easy.stub!(:new).and_return(@mock_curb)
+        @mock_curb.should_receive(:userpwd=).with("agent:donttellanyone")
       
-        TestHarness.get({:host => "secret.domain.com", :port => 80, :username => "agent", :password => "donttellanyone"}).
-          should be_a_kind_of(CurbFu::Response::OK)
+        TestHarness.get({:host => "secret.domain.com", :port => 80, :username => "agent", :password => "donttellanyone"})
       end
       it "should append parameters to the url" do
         @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
@@ -120,8 +119,7 @@ describe CurbFu::Request::Base do
     end
 
     it "should send each parameter to Curb#http_put" do
-      TestHarness.stub!(:create_put_fields).and_return('q=derek','r=matt')
-      @mock_curb.should_receive(:http_put).with("q=derek","r=matt")
+      @mock_curb.should_receive(:http_put).with("q=derek&r=matt")
 
       response = TestHarness.put(
         {:host => "google.com", :port => 80, :path => "/search"},

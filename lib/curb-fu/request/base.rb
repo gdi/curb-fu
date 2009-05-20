@@ -78,10 +78,11 @@ module CurbFu
       def create_put_fields(params)
         return params if params.is_a? String
         
-        params.collect do |k,v|
+        params.inject([]) do |list, (k,v)|
           v = v.is_a?(Array) ? v.join(',') : v
-          "#{k}=#{v}"
-        end
+          list << "#{k}=#{v}"
+          list
+        end.join('&')
       end
 
       def create_file_fields(filez)
