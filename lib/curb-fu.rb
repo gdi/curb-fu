@@ -39,5 +39,17 @@ module CurbFu
         @stubs = nil
       end
     end
+    
+    def stubs
+      @stubs
+    end
+    
+    def debug=(val)
+      @debug = val ? true : false
+    end
+    
+    def debug?
+      @debug
+    end
   end
 end
