@@ -105,6 +105,26 @@ describe CurbFu::Request::Test do
     end
   end
   
+  describe "hashify_params" do
+    it "should turn a URL-formatted query string into a hash of parameters" do
+      hash = CurbFu::Request.hashify_params("color=red&shape=round")
+      hash.should include('color' => 'red')
+      hash.should include('shape' => 'round')
+    end
+    it "should convert array-formatted params into a hash of arrays" do
+      hash = CurbFu::Request.hashify_params("make[]=Chevrolet&make[]=Pontiac&make[]=GMC")
+      hash.should  == {'make' => ['Chevrolet','Pontiac','GMC']}
+    end
+    it "should convert hash parameters into a hash of hashes" do
+      hash = CurbFu::Request.hashify_params("car[make]=Chevrolet&car[color]=red&car[wheel_shape]=round")
+      hash.should  == {'car' => {
+        'make' => 'Chevrolet',
+        'color' => 'red',
+        'wheel_shape' => 'round'
+      }}
+    end
+  end
+  
   describe "get" do
     it 'should delegate the get request to the Rack::Test instance' do
       CurbFu.stubs['a.example.com'].should_receive(:get).with('http://a.example.com/gimme/html', anything).and_return(@mock_rack_response)

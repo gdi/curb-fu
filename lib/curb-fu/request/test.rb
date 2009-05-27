@@ -12,6 +12,7 @@ module CurbFu
       module ClassMethods
         def get(url, params = {})
           request_options = build_request_options(url)
+          params = hashify_params(params) if params.is_a?(String)
           respond(request_options[:interface], :get, request_options[:url],
             params, request_options[:headers], request_options[:username], request_options[:password])
         end
@@ -37,8 +38,30 @@ module CurbFu
         
         def delete(url, params = {})
           request_options = build_request_options(url)
+          params = hashify_params(params) if params.is_a?(String)
           respond(request_options[:interface], :delete, request_options[:url],
             params, request_options[:headers], request_options[:username], request_options[:password])
+        end
+        
+        def hashify_params(param_string)
+          param_string.split('&').inject({}) do |hsh, pair|
+            key, value = pair.split('=')
+            
+            if key.match(/(.+)\[\]$/)
+              key = $1
+              hsh[key] ||= []
+              hsh[key] << value
+            elsif key.match(/([^\[]+)\[(.+)\]$/)
+              key = $1
+              subkey = $2
+              hsh[key] ||= {}
+              hsh[key].update( subkey => value )
+            else
+              hsh[key] = value
+            end
+
+            hsh
+          end
         end
         
         def build_request_options(url)
@@ -60,7 +83,13 @@ module CurbFu
               end
             end
             interface.authorize(username, password) unless username.nil?
-            response = interface.send(operation, url, params)
+            puts "sending #{operation} to #{url} using interface #{interface.inspect}" if CurbFu.debug?
+            begin
+              response = interface.send(operation, url, params)
+            rescue => e
+              puts "Caught error: #{e}, #{e.backtrace.join("\n")}" if CurbFu.debug?
+              raise e
+            end
             CurbFu::Response::Base.from_rack_response(response)
           end
         end
