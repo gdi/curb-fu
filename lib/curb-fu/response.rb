@@ -40,6 +40,10 @@ module CurbFu
         end
       end
       
+      def to_hash
+        { :status => status, :body => body, :headers => headers }
+      end
+      
       def set_response_type(status)
         case status
         when 100..199 then
@@ -116,6 +120,10 @@ module CurbFu
         def from_curb_response(curb)
           response = self.new(curb.response_code, curb.header_str, curb.body_str)
           response
+        end
+        
+        def from_hash(hash)
+          self.new(hash[:status], hash[:headers], hash[:body])
         end
       end
     end

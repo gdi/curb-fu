@@ -83,7 +83,7 @@ module CurbFu
               end
             end
             interface.authorize(username, password) unless username.nil?
-            puts "sending #{operation} to #{url} using interface #{interface.inspect}" if CurbFu.debug?
+            puts "sending #{operation} to #{url} with params #{params.inspect} using interface #{interface.inspect}" if CurbFu.debug?
             begin
               response = interface.send(operation, url, params)
             rescue => e
