@@ -123,6 +123,7 @@ module CurbFu
         end
         
         def from_hash(hash)
+          return nil if hash.nil?
           self.new(hash[:status], hash[:headers], hash[:body])
         end
       end
