@@ -38,6 +38,7 @@ module CurbFu
 
       def post(url, params = {})
         fields = create_post_fields(params)
+        fields = [fields] if fields.is_a?(String)
 
         curb = self.build(url)
         curb.http_post(*fields)
