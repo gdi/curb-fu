@@ -14,7 +14,7 @@ module CurbFu
           end
 
           curb.headers = url_params[:headers] || {}
-          curb.headers["Expect"] = '' unless url_params[:headers]["Expect"]
+          curb.headers["Expect"] = '' unless url_params[:headers] && url_params[:headers]["Expect"]
         end
 
         curb.timeout = @timeout
