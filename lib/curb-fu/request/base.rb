@@ -39,7 +39,7 @@ module CurbFu
         fields = create_post_fields(params)
 
         curb = self.build(url)
-        curb.headers["Expect:"] = ''
+        curb.headers["Expect"] = ''
         curb.http_post(*fields)
         CurbFu::Response::Base.from_curb_response(curb)
       end
