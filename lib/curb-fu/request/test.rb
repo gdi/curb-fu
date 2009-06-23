@@ -25,7 +25,10 @@ module CurbFu
         
         def post_file(url, params = {}, filez = {})
           request_options = build_request_options(url)
-          uploaded_files = filez.inject({}) { |hsh, f| hsh["file_#{hsh.keys.length}"] = Rack::Test::UploadedFile.new(f.last); hsh }
+          uploaded_files = filez.inject({}) do |hsh, (name, path)|
+            hsh[name] = Rack::Test::UploadedFile.new(path)
+            hsh
+          end
           respond(request_options[:interface], :post, request_options[:url], 
             params.merge(uploaded_files), request_options[:headers], request_options[:username], request_options[:password])
         end

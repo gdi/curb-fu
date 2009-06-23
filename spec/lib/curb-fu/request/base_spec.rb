@@ -111,6 +111,28 @@ describe CurbFu::Request::Base do
         { 'q' => 'derek', 'r' => 'matt' })
     end
   end
+  
+  describe "post_file" do
+    it "should set encoding to multipart/form-data" do
+      @cc = mock(Curl::PostField)
+      Curl::PostField.stub!(:file).and_return(@cc)
+      mock_curl = mock(Object, :http_post => nil)
+      mock_curl.should_receive(:multipart_form_post=).with(true)
+      TestHarness.stub!(:build).and_return(mock_curl)
+      CurbFu::Response::Base.stub!(:from_curb_response)
+      
+      TestHarness.post_file('http://example.com', {'gelato' => 'peanut butter'}, 'cc_pic' => '/images/credit_card.jpg')
+    end
+    it "should post with file fields" do
+      @cc = mock(Curl::PostField)
+      Curl::PostField.should_receive(:file).and_return(@cc)
+      mock_curl = mock(Object, :multipart_form_post= => nil, :http_post => nil)
+      TestHarness.stub!(:build).and_return(mock_curl)
+      CurbFu::Response::Base.stub!(:from_curb_response)
+      
+      TestHarness.post_file('http://example.com', {'gelato' => 'peanut butter'}, 'cc_pic' => '/images/credit_card.jpg')
+    end
+  end
 
   describe "put" do
     before(:each) do
