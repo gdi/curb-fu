@@ -123,6 +123,10 @@ describe CurbFu::Request::Test do
         'wheel_shape' => 'round'
       }}
     end
+    it 'should remove any leading ?s' do
+      hash = CurbFu::Request.hashify_params("?q=134&dave=astronaut")
+      hash.keys.should_not include('?q')
+    end
   end
   
   describe "get" do

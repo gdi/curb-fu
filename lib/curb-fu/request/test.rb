@@ -44,6 +44,7 @@ module CurbFu
         end
         
         def hashify_params(param_string)
+          param_string.sub!(/^\?/,'')
           param_string.split('&').inject({}) do |hsh, pair|
             key, value = pair.split('=')
             
