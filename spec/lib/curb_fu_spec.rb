@@ -26,5 +26,12 @@ describe CurbFu do
       CurbFu.stubs = { 'example.com' => mock(Object, :call => [200, {}, "Hello, World"] ) }
       CurbFu.stubs['example.com'].should be_a_kind_of(CurbFu::Request::Test::Interface)
     end
+    it 'should set the hostname on each interface' do
+      CurbFu.stubs = {
+        'ysthevanishedomens.com' => mock(Object)
+      }
+      
+      CurbFu.stubs['ysthevanishedomens.com'].hostname.should == 'ysthevanishedomens.com'
+    end
   end
 end

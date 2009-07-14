@@ -85,7 +85,7 @@ module CurbFu
             interface.authorize(username, password) unless username.nil?
             puts "sending #{operation} to #{url} with params #{params.inspect} using interface #{interface.inspect}" if CurbFu.debug?
             begin
-              response = interface.send(operation, url, params)
+              response = interface.send(operation, url, params, 'SERVER_NAME' => interface.hostname)
             rescue => e
               puts "Caught error: #{e}, #{e.backtrace.join("\n")}" if CurbFu.debug?
               raise e
@@ -137,10 +137,11 @@ module CurbFu
       class Interface
         include Rack::Test::Methods
         
-        attr_accessor :app
+        attr_accessor :app, :hostname
         
-        def initialize(app)
-          @app = app
+        def initialize(app, hostname = 'example.org')
+          self.app = app
+          self.hostname = hostname
         end
       end
     end

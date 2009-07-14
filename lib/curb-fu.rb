@@ -28,7 +28,7 @@ module CurbFu
     def stubs=(val)
       if val
         @stubs = val.inject({}) do |hsh, (hostname, rack_app)|
-          hsh[hostname] = CurbFu::Request::Test::Interface.new(rack_app)
+          hsh[hostname] = CurbFu::Request::Test::Interface.new(rack_app, hostname)
           hsh
         end
       
