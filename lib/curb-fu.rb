@@ -27,9 +27,9 @@ module CurbFu
     
     def stubs=(val)
       if val
-        @stubs = val.inject({}) do |hsh, (hostname, rack_app)|
-          hsh[hostname] = CurbFu::Request::Test::Interface.new(rack_app, hostname)
-          hsh
+        @stubs = {}
+        val.each do |hostname, rack_app|
+          stub(hostname, rack_app)
         end
       
         unless CurbFu::Request.include?(CurbFu::Request::Test)
@@ -38,6 +38,11 @@ module CurbFu
       else
         @stubs = nil
       end
+    end
+
+    def stub(hostname, rack_app)
+      raise "You must use CurbFu.stubs= to define initial stubs before using stub()" if @stubs.nil?
+      @stubs[hostname] = CurbFu::Request::Test::Interface.new(rack_app, hostname)
     end
     
     def stubs

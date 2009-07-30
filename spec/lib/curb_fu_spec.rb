@@ -17,6 +17,17 @@ describe CurbFu do
       CurbFu.stubs = nil
     end
   end
+
+  describe 'stub' do
+    it 'should create a stub interface for the given hostname using the supplied object' do
+      CurbFu.stubs = { 'localhost' => Object }
+      my_rack_app = mock(Object)
+      CurbFu.stub('webserver.com',my_rack_app)
+      CurbFu.stubs['webserver.com'].
+        should be_an_instance_of(CurbFu::Request::Test::Interface)
+      CurbFu.stubs = nil
+    end
+  end
   
   describe 'stubs' do
     it 'should return nil by default' do
