@@ -66,6 +66,12 @@ describe CurbFu::Request::Parameter do
           
         field.content.should == "uh-oh! We've failed!"
       end
+      it "should not CGI-escape @ symbols" do
+        field = CurbFu::Request::Parameter.new("messages", "bob@apple.com").
+          to_curl_post_field
+          
+        field.content.should == "bob@apple.com"
+      end
     end
   end
 end
