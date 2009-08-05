@@ -155,8 +155,8 @@ describe CurbFu::Request::Base do
         should == "my awesome data that I'm sending to you"
     end
     it "should convert hash items into Curl::PostFields" do
-      Curl::PostField.should_receive(:content).with(:us,'obama')
-      Curl::PostField.should_receive(:content).with(:de,'merkel')
+      Curl::PostField.should_receive(:content).with('us','obama')
+      Curl::PostField.should_receive(:content).with('de','merkel')
       TestHarness.create_post_fields(:us => 'obama', :de => 'merkel')
     end
     it "should handle params that contain arrays" do
