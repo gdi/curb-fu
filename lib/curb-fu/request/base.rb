@@ -71,7 +71,7 @@ module CurbFu
           value_string = value.join(',') if value.is_a?(Array)
           value_string ||= value.to_s
 
-          fields << Curl::PostField.content(name,value_string)
+          fields << Curl::PostField.content(name.to_s,value_string)
         end
         return fields
       end
