@@ -17,6 +17,17 @@ describe CurbFu do
       CurbFu.stubs = nil
     end
   end
+
+  describe 'stub' do
+    it 'should create a stub interface for the given hostname using the supplied object' do
+      CurbFu.stubs = { 'localhost' => Object }
+      my_rack_app = mock(Object)
+      CurbFu.stub('webserver.com',my_rack_app)
+      CurbFu.stubs['webserver.com'].
+        should be_an_instance_of(CurbFu::Request::Test::Interface)
+      CurbFu.stubs = nil
+    end
+  end
   
   describe 'stubs' do
     it 'should return nil by default' do
@@ -25,6 +36,13 @@ describe CurbFu do
     it 'should return a hash of hostnames pointing to CurbFu::StubbedRequest::TestInterfaces' do
       CurbFu.stubs = { 'example.com' => mock(Object, :call => [200, {}, "Hello, World"] ) }
       CurbFu.stubs['example.com'].should be_a_kind_of(CurbFu::Request::Test::Interface)
+    end
+    it 'should set the hostname on each interface' do
+      CurbFu.stubs = {
+        'ysthevanishedomens.com' => mock(Object)
+      }
+      
+      CurbFu.stubs['ysthevanishedomens.com'].hostname.should == 'ysthevanishedomens.com'
     end
   end
 end

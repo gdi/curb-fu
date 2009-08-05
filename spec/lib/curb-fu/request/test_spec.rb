@@ -6,9 +6,9 @@ end
 
 describe CurbFu::Request::Test do
   before :each do
-    @a_server = mock(Object, :call => [200, { 'Content-Type' => 'spec/testcase' }, "A is for Archer, an excellent typeface."])
-    @b_server = mock(Object, :call => [200, {}, "B is for Ballyhoo, like what happened when Twitter switched to Scala"])
-    @c_server = mock(Object, :call => [200, {}, "C is for Continuous, as in Integration"])
+    @a_server = mock(Object, :call => [200, { 'Content-Type' => 'spec/testcase' }, ["A is for Archer, an excellent typeface."]])
+    @b_server = mock(Object, :call => [200, {},["B is for Ballyhoo, like what happened when Twitter switched to Scala"]])
+    @c_server = mock(Object, :call => [200, {}, ["C is for Continuous, as in Integration"]])
     
     CurbFu.stubs = {
       'a.example.com' => @a_server,
@@ -96,7 +96,7 @@ describe CurbFu::Request::Test do
   describe "respond" do
     it "should convert headers to uppercase, underscorized" do
       CurbFu::Response::Base.stub!(:from_rack_response)
-      mock_interface = mock(Object, :send => mock(Object, :status => 200))
+      mock_interface = mock(Object, :send => mock(Object, :status => 200), :hostname= => nil, :hostname => 'a.example.com')
       mock_interface.should_receive(:header).with('HTTP_X_MONARCHY','false')
       mock_interface.should_receive(:header).with('HTTP_X_ANARCHO_SYNDICALIST_COMMUNE','true')
       
@@ -123,11 +123,15 @@ describe CurbFu::Request::Test do
         'wheel_shape' => 'round'
       }}
     end
+    it 'should remove any leading ?s' do
+      hash = CurbFu::Request.hashify_params("?q=134&dave=astronaut")
+      hash.keys.should_not include('?q')
+    end
   end
   
   describe "get" do
     it 'should delegate the get request to the Rack::Test instance' do
-      CurbFu.stubs['a.example.com'].should_receive(:get).with('http://a.example.com/gimme/html', anything).and_return(@mock_rack_response)
+      CurbFu.stubs['a.example.com'].should_receive(:get).with('http://a.example.com/gimme/html', anything, anything).and_return(@mock_rack_response)
       @a_server.should respond_to(:call)
       CurbFu::Request.get('http://a.example.com/gimme/html')
     end
@@ -146,7 +150,7 @@ describe CurbFu::Request::Test do
   describe "post" do
     it 'should delegate the post request to the Rack::Test instance' do
       CurbFu.stubs['b.example.com'].should_receive(:post).
-        with('http://b.example.com/html/backatcha', {'html' => 'CSRF in da house! <script type="text/compromise">alert("gotcha!")</script>'}).
+        with('http://b.example.com/html/backatcha', {'html' => 'CSRF in da house! <script type="text/compromise">alert("gotcha!")</script>'}, anything).
         and_return(@mock_rack_response)
       CurbFu::Request.post('http://b.example.com/html/backatcha',
         {'html' => 'CSRF in da house! <script type="text/compromise">alert("gotcha!")</script>'})
@@ -166,7 +170,7 @@ describe CurbFu::Request::Test do
   describe "post_file" do
     it 'should delegate the post request to the Rack::Test instance' do
       CurbFu.stubs['b.example.com'].should_receive(:post).
-        with('http://b.example.com/html/backatcha', {"file_0"=>anything, "filename"=>"asdf ftw"}).
+        with('http://b.example.com/html/backatcha', {"file_0"=>anything, "filename"=>"asdf ftw"}, anything).
         and_return(@mock_rack_response)
       CurbFu::Request.post_file('http://b.example.com/html/backatcha', {'filename' => 'asdf ftw'}, {'foo.txt' => test_file_path })
     end
@@ -184,7 +188,7 @@ describe CurbFu::Request::Test do
   
   describe "put" do
     it 'should delegate the put request to the Rack::Test instance' do
-      CurbFu.stubs['a.example.com'].should_receive(:put).with('http://a.example.com/gimme/html', anything).and_return(@mock_rack_response)
+      CurbFu.stubs['a.example.com'].should_receive(:put).with('http://a.example.com/gimme/html', anything, anything).and_return(@mock_rack_response)
       CurbFu::Request.put('http://a.example.com/gimme/html')
     end
     it 'should raise Curl::Err::ConnectionFailedError if hostname is not defined in stub list' do
@@ -201,7 +205,7 @@ describe CurbFu::Request::Test do
   
   describe "delete" do
     it 'should delegate the delete request to the Rack::Test instance' do
-      CurbFu.stubs['a.example.com'].should_receive(:delete).with('http://a.example.com/gimme/html', anything).and_return(@mock_rack_response)
+      CurbFu.stubs['a.example.com'].should_receive(:delete).with('http://a.example.com/gimme/html', anything, anything).and_return(@mock_rack_response)
       @a_server.should respond_to(:call)
       CurbFu::Request.delete('http://a.example.com/gimme/html')
     end

@@ -62,7 +62,8 @@ describe Hash do
       {
         "vielleicht" => "perhaps",
         "ratings" => [5, 3, 5, 2, 4]
-      }.to_param("things").should == "things[ratings][]=5&things[ratings][]=3&things[ratings][]=5&things[ratings][]=2&things[ratings][]=4&things[vielleicht]=perhaps"
+      }.to_param("things").
+        should == "things[vielleicht]=perhaps&things[ratings][]=5&things[ratings][]=3&things[ratings][]=5&things[ratings][]=2&things[ratings][]=4"
     end
   end
 end
