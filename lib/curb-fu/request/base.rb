@@ -29,10 +29,8 @@ module CurbFu
       end
 
       def put(url, params = {})
-        fields = create_put_fields(params)
-
-        curb = self.build(url)
-        curb.http_put(fields)
+        curb = self.build(url, params)
+        curb.http_put
         CurbFu::Response::Base.from_curb_response(curb)
       end
 

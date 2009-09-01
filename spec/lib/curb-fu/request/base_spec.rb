@@ -141,7 +141,8 @@ describe CurbFu::Request::Base do
     end
 
     it "should send each parameter to Curb#http_put" do
-      @mock_curb.should_receive(:http_put).with("q=derek&r=matt")
+      Curl::Easy.should_receive(:new).with('http://google.com:80/search?q=derek&r=matt').and_return(@mock_curb)
+      @mock_curb.should_receive(:http_put)
 
       response = TestHarness.put(
         {:host => "google.com", :port => 80, :path => "/search"},
