@@ -30,7 +30,7 @@ module CurbFu
 
       def put(url, params = {})
         curb = self.build(url, params)
-        curb.http_put
+        curb.http_put("")
         CurbFu::Response::Base.from_curb_response(curb)
       end
 
