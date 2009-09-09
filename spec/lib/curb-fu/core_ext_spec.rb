@@ -59,11 +59,17 @@ describe Hash do
       }.to_param("things").should == "things[kraplach]=messy&things[zebot]=2003"
     end
     it "should handle having an array as one of its parameters" do
-      {
+      result = {
         "vielleicht" => "perhaps",
         "ratings" => [5, 3, 5, 2, 4]
-      }.to_param("things").
-        should == "things[vielleicht]=perhaps&things[ratings][]=5&things[ratings][]=3&things[ratings][]=5&things[ratings][]=2&things[ratings][]=4"
+      }.to_param("things")
+      result.split('&').size.should == 6
+      result.should =~ /things\[vielleicht\]=perhaps/
+      result.should =~ /things\[ratings\]\[\]=5/
+      result.should =~ /things\[ratings\]\[\]=3/
+      result.should =~ /things\[ratings\]\[\]=5/
+      result.should =~ /things\[ratings\]\[\]=2/
+      result.should =~ /things\[ratings\]\[\]=4/
     end
   end
 end
