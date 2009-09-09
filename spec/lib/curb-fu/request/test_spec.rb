@@ -170,7 +170,7 @@ describe CurbFu::Request::Test do
   describe "post_file" do
     it 'should delegate the post request to the Rack::Test instance' do
       CurbFu.stubs['b.example.com'].should_receive(:post).
-        with('http://b.example.com/html/backatcha', {"file_0"=>anything, "filename"=>"asdf ftw"}, anything).
+        with('http://b.example.com/html/backatcha', hash_including("foo.txt"=>anything, "filename"=>"asdf ftw"), anything).
         and_return(@mock_rack_response)
       CurbFu::Request.post_file('http://b.example.com/html/backatcha', {'filename' => 'asdf ftw'}, {'foo.txt' => test_file_path })
     end
