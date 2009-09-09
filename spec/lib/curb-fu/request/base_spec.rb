@@ -197,4 +197,17 @@ describe CurbFu::Request::Base do
       TestHarness.create_put_fields('q' => 1).should == "q=1"
     end
   end
+  
+  describe "global_headers" do
+    it "should use any global headers for every request" do
+      TestHarness.global_headers = {
+        'X-Http-Modern-Parlance' => 'Transmogrify'
+      }
+      
+      mock_curl = mock(Object, :timeout= => 'sure', :http_get => 'uhuh', :response_code => 200, :header_str => 'yep: sure', :body_str => 'ok')
+      Curl::Easy.stub!(:new).and_return(mock_curl)
+      mock_curl.should_receive(:headers=).with('X-Http-Modern-Parlance' => 'Transmogrify')
+      TestHarness.get('http://example.com')
+    end
+  end
 end
