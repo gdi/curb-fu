@@ -6,7 +6,7 @@ module CurbFu
       def build(url_params, query_params = {})
         curb = Curl::Easy.new(build_url(url_params, query_params))
 
-        curb.headers = @global_headers
+        headers = global_headers
         
         unless url_params.is_a?(String)
           curb.userpwd = "#{url_params[:username]}:#{url_params[:password]}" if url_params[:username]
@@ -16,10 +16,11 @@ module CurbFu
             curb.http_auth_types = CurbFu::Authentication::BASIC
           end
 
-          curb.headers.merge!(url_params[:headers]) unless url_params[:headers].nil?
-          curb.headers["Expect"] = '' unless url_params[:headers] && url_params[:headers]["Expect"]
+          headers.merge!(url_params[:headers]) unless url_params[:headers].nil?
+          headers["Expect"] = '' unless url_params[:headers] && url_params[:headers]["Expect"]
         end
         
+        curb.headers = headers
         curb.timeout = @timeout
 
         curb
