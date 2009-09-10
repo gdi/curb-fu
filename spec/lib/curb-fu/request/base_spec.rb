@@ -209,5 +209,20 @@ describe CurbFu::Request::Base do
       mock_curl.should_receive(:headers=).with('X-Http-Modern-Parlance' => 'Transmogrify')
       TestHarness.get('http://example.com')
     end
+    it "should not keep temporary headers from previous requests" do
+      TestHarness.global_headers = {
+        'X-Http-Political-Party' => 'republican'
+      }
+      
+      mock_curl = mock(Object, :timeout= => 'sure', :http_get => 'uhuh', :response_code => 200, :header_str => 'yep: sure', :body_str => 'ok')
+      Curl::Easy.stub!(:new).and_return(mock_curl)
+      mock_curl.stub!(:headers=)
+      
+      TestHarness.get(:host => 'example.com', :headers => { 'Content-Type' => 'cash/dollars' })
+      
+      mock_curl.should_not_receive(:headers=).with(hash_including('Content-Type' => 'cash/dollars'))
+      TestHarness.get('http://example.com')
+      TestHarness.global_headers.should_not include('Content-Type' => 'cash/dollars')  # leave no trace!
+    end
   end
 end

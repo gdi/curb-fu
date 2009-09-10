@@ -16,7 +16,7 @@ module CurbFu
             curb.http_auth_types = CurbFu::Authentication::BASIC
           end
 
-          headers.merge!(url_params[:headers]) unless url_params[:headers].nil?
+          headers = headers.merge(url_params[:headers]) unless url_params[:headers].nil?
           headers["Expect"] = '' unless url_params[:headers] && url_params[:headers]["Expect"]
         end
         
