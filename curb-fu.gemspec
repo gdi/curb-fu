@@ -1,7 +1,7 @@
 spec = Gem::Specification.new do |s|
     s.platform  =   Gem::Platform::RUBY
     s.name      =   "curb-fu"
-    s.version   =   "0.4.0"
+    s.version   =   "0.4.1"
     s.author    =   "Phil Green, Derek Kastner, Matt Wilson"
     s.email     =   "support@greenviewdata.com"
     s.summary   =   "Friendly wrapper for curb"
