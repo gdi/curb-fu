@@ -65,7 +65,13 @@ module CurbFu
 
         curb = self.build(url)
         curb.multipart_form_post = true
-        curb.http_post(*fields)
+        
+        begin
+          curb.http_post(*fields)
+        rescue Curl::Err::InvalidPostFieldError => e
+          field_list = params.inject([]) { |list, (name, value)| list << "#{name} => #{value.to_s[0..49].inspect}"; list }
+          raise e, "There was an attempt to post invalid fields.  The fields were:\n#{field_list.join("\n")}"
+        end
         CurbFu::Response::Base.from_curb_response(curb)
       end
 

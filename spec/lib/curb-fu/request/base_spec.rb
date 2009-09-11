@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/../../../spec_helper'
+require 'curb'
 
 def regex_for_url_with_params(url, *params)
   regex = '^' + url.gsub('/','\/').gsub('.','\.')
@@ -131,6 +132,17 @@ describe CurbFu::Request::Base do
       CurbFu::Response::Base.stub!(:from_curb_response)
       
       TestHarness.post_file('http://example.com', {'gelato' => 'peanut butter'}, 'cc_pic' => '/images/credit_card.jpg')
+    end
+    it "should offer more debug information about CurlErrInvalidPostField errors" do
+      @cc = mock(Curl::PostField)
+      Curl::PostField.should_receive(:file).and_return(@cc)
+      mock_curl = mock(Object, :multipart_form_post= => nil)
+      mock_curl.stub!(:http_post).and_raise(Curl::Err::InvalidPostFieldError)
+      TestHarness.stub!(:build).and_return(mock_curl)
+      CurbFu::Response::Base.stub!(:from_curb_response)
+      
+      lambda { TestHarness.post_file('http://example.com', {'gelato' => 'peanut butter'}, 'cc_pic' => '/images/credit_card.jpg') }.
+        should raise_error(Curl::Err::InvalidPostFieldError)
     end
   end
 
