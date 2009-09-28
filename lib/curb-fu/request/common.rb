@@ -6,7 +6,7 @@ module CurbFu
       end
 
       def timeout
-        @timeout.nil? ? 60 : @timeout
+        @timeout.nil? ? 10 : @timeout
       end
 
       def build_url(url_params, query_params = {})
