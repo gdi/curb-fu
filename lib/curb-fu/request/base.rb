@@ -56,7 +56,14 @@ module CurbFu
 
         curb = self.build(url)
         curb.http_post(*fields)
-        CurbFu::Response::Base.from_curb_response(curb)
+        response = CurbFu::Response::Base.from_curb_response(curb)
+        if CurbFu.debug?
+          puts "Response from server was"
+          puts "Status: #{response.status}"
+          puts "Headers: #{response.headers.inspect}"
+          puts "Body: #{response.body.inspect}"
+        end
+        response
       end
 
       def post_file(url, params = {}, filez = {})
