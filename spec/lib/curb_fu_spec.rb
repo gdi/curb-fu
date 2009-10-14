@@ -31,6 +31,7 @@ describe CurbFu do
   
   describe 'stubs' do
     it 'should return nil by default' do
+      CurbFu.stubs = nil # no way to guarantee that CurbFu.stubs hasn't already been set by another spec
       CurbFu.stubs.should be_nil
     end
     it 'should return a hash of hostnames pointing to CurbFu::StubbedRequest::TestInterfaces' do
