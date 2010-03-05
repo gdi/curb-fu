@@ -8,6 +8,17 @@ Curb can be found at http://github.com/taf2/curb
 
 This gem is released under the terms of the Ruby license.  See the LICENSE file for details.
 
+=== Troubleshooting
+
+If you are POSTing data and curb seems to be locking up, try posting it with an explicit 'Expect: 100-continue' header.
+
+You can set this per-request, e.g.
+  CurbFu.post({:host => 'example.com', :headers => { "Expect" => "100-continue" }}, { "data" => "here" })
+or you can configure it as a global header, e.g.
+  CurbFu.global_headers = { "Expect" => "100-continue" }
+  # ... then make your requests as normal
+however you feel best.
+
 === Prerequisites
 
 * Ruby (tested on 1.8.7, 1.9.1)
