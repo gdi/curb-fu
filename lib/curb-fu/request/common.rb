@@ -13,10 +13,13 @@ module CurbFu
         if url_params.is_a? String
           built_url = url_params
         else
-          built_url = "http://#{url_params[:host]}"
+          protocol = url_params[:protocol] || "http"
+          built_url = "#{protocol}://#{url_params[:host]}"
           built_url += ":" + url_params[:port].to_s if url_params[:port]
           built_url += url_params[:path] if url_params[:path]
         end
+        
+        # TODO: update for use with CurbFu::Entity
         if query_params.is_a? String
           built_url += query_params
         elsif !query_params.empty?

@@ -1,9 +1,9 @@
 spec = Gem::Specification.new do |s|
     s.platform  =   Gem::Platform::RUBY
     s.name      =   "curb-fu"
-    s.version   =   "0.4.3"
-    s.author    =   "Phil Green, Derek Kastner, Matt Wilson"
-    s.email     =   "support@greenviewdata.com"
+    s.version   =   "0.4.4"
+    s.author    =   "Derek Kastner, Matt Wilson"
+    s.email     =   "development@greenviewdata.com"
     s.summary   =   "Friendly wrapper for curb"
     s.files     =   Dir.glob('lib/**/*.rb')
     s.require_path  =   "lib"

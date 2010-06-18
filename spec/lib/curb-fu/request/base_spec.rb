@@ -49,6 +49,9 @@ describe CurbFu::Request::Base do
       TestHarness.build_url('http://chocolatecheese.com','?nuts=true').
         should == 'http://chocolatecheese.com?nuts=true'
     end
+    it "should accept a 'protocol' parameter" do
+      TestHarness.build_url(:host => "mybank.com", :protocol => "https").should == "https://mybank.com"
+    end
   end
 
   describe "get" do
@@ -196,8 +199,8 @@ describe CurbFu::Request::Base do
     end
     
     it 'should handle multiple parameters' do
-      TestHarness.create_put_fields(:rock => 'beatles', :rap => '2pac').
-        should == "rock=beatles&rap=2pac"
+      TestHarness.create_put_fields(:rock => 'beatles', :rap => '2pac').split("&").
+        should include("rock=beatles","rap=2pac")
     end
     
     it "should handle params that contain arrays" do

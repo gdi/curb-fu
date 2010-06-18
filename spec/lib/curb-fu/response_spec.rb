@@ -54,10 +54,22 @@ describe CurbFu::Response::Base do
   end
   
   describe "response modules" do
-    describe "to_i" do
+    describe ".to_i" do
       it "should return the status code represented by the module" do
         CurbFu::Response::OK.to_i.should == 200
         CurbFu::Response::NotFound.to_i.should == 404
+      end
+    end
+    describe "#message" do
+      it "should return a string indicating the english translation of the status code" do
+        r = CurbFu::Response::Base.new(200, {}, "text")
+        r.message.should == "OK"
+        r = CurbFu::Response::Base.new(404, {}, "text")
+        r.message.should == "Not Found"
+        r = CurbFu::Response::Base.new(302, {}, "text")
+        r.message.should == "Found"
+        r = CurbFu::Response::Base.new(505, {}, "text")
+        r.message.should == "Version Not Supported"
       end
     end
   end

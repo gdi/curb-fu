@@ -56,5 +56,7 @@ puts response.body
 response = CurbFu.post({:host => 'example.com', :path => '/some/resource'}, { :color => 'red', :shape => 'sphere' })
 puts response.body unless response.success?
 
+if you need https:
+response = CurbFu.post({:host => 'example.com', :path => '/some/resource', :protocol => "https"}, { :color => 'red', :shape => 'sphere' })
 
 Have fun!
