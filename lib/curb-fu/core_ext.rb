@@ -5,7 +5,7 @@ require 'cgi'
 module CurbFu
   module HashExtensions
     def self.included(base)
-      base.send(:include, InstanceMethods) unless base.methods.include?(:to_param)
+      base.send(:include, InstanceMethods) unless base.instance_methods.include?("to_param")
       #base.extend(ClassMethods)
     end
     
@@ -21,12 +21,12 @@ module CurbFu
   
   module ObjectExtensions
     def self.included(base)
-      base.send(:include, InstanceMethods) unless base.methods.include?(:to_param)
+      base.send(:include, InstanceMethods) unless base.instance_methods.include?("to_param")
       #base.extend(ClassMethods)
     end
     
     module InstanceMethods
-      def to_param(prefix)
+      def to_param(prefix = self.class)
         value = CGI::escape(to_s)
         "#{prefix}=#{value}"
       end
@@ -35,7 +35,7 @@ module CurbFu
   
   module ArrayExtensions
     def self.included(base)
-      base.send(:include, InstanceMethods) unless base.methods.include?(:to_param)
+      base.send(:include, InstanceMethods) unless base.instance_methods.include?("to_param")
       #base.extend(ClassMethods)
     end
     
@@ -54,6 +54,9 @@ end
 class Array
   include CurbFu::ArrayExtensions
 end
-class Object
+class String
+  include CurbFu::ObjectExtensions
+end
+class Fixnum
   include CurbFu::ObjectExtensions
 end
