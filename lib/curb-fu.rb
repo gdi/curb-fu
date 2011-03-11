@@ -7,20 +7,20 @@ require 'curb-fu/core_ext'
 
 module CurbFu
   class << self
-    def get(*args)
-      CurbFu::Request.get(*args)
+    def get(*args, &block)
+      CurbFu::Request.get(*args, &block)
     end
 
-    def post(*args)
-      CurbFu::Request.post(*args)
+    def post(*args, &block)
+      CurbFu::Request.post(*args, &block)
     end
 
-    def put(*args)
-      CurbFu::Request.put(*args)
+    def put(*args, &block)
+      CurbFu::Request.put(*args, &block)
     end
 
-    def delete(*args)
-      CurbFu::Request.delete(*args)
+    def delete(*args, &block)
+      CurbFu::Request.delete(*args, &block)
     end
   
     attr_accessor :stubs
