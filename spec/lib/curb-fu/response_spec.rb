@@ -115,4 +115,70 @@ describe CurbFu::Response::Base do
       end
     end
   end
+
+  describe "get_fields" do
+
+    before(:each) do
+      headers = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=ISO-8859-1\r\nContent-Length: 18\r\nSet-Cookie: first cookie value\r\nServer: gws\r\nTransfer-Encoding: chunked\r\nSet-Cookie: second cookie value\r\n\r\n"
+      mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => headers, :timeout= => nil)
+      @cf = CurbFu::Response::Base.from_curb_response(mock_curb)
+    end
+
+    it "should return an array containing all matching field values" do
+      @cf.get_fields("Set-Cookie").should == ["first cookie value", "second cookie value"]
+    end
+
+    it "should do a case-insensitive match of the key to header fields" do
+      @cf.get_fields("Set-cookie").should == ["first cookie value", "second cookie value"]
+    end
+
+    it "should return nil when key matches no header field" do
+      @cf.get_fields("non-existent").should == nil
+    end
+
+  end
+
+  describe "content_type" do
+
+    it "should return the content-type as a mime type, disgarding charset or other info found in the content-type header" do
+      headers = "HTTP/1.1 200 OK\r\nContent-Length: 18\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n"
+      mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => headers, :timeout= => nil)
+      @cf = CurbFu::Response::Base.from_curb_response(mock_curb)
+      @cf.content_type.should == "text/html"
+    end    
+
+    it "should return the content-type from the last header field value" do
+      headers = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=ISO-8859-1\r\nContent-Length: 18\r\nContent-Type: application/xhtml+xml; charset=UTF-8\r\n\r\n"
+      mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => headers, :timeout= => nil)
+      @cf = CurbFu::Response::Base.from_curb_response(mock_curb)
+      @cf.content_type.should == "application/xhtml+xml"
+    end
+
+    it "should return nil when the response doesn't contain a content-type header" do
+      headers = "HTTP/1.1 200 OK\r\nr\nContent-Length: 18r\n\r\n"
+      mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => headers, :timeout= => nil)
+      @cf = CurbFu::Response::Base.from_curb_response(mock_curb)
+      @cf.content_type.should == nil
+    end
+
+  end
+
+  describe "content_length" do
+
+    it "should return the last content-length header field value" do
+      headers = "HTTP/1.1 200 OK\r\nContent-Length: 100\r\nContent-Length: 18\r\n\r\n"
+      mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => headers, :timeout= => nil)
+      @cf = CurbFu::Response::Base.from_curb_response(mock_curb)
+      @cf.content_length.should == 18
+    end
+
+    it "should return nil when the response doesn't contain a content-length header" do
+      headers = "HTTP/1.1 200 OK\r\nr\nContent-Type: text/htmlr\n\r\n"
+      mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => headers, :timeout= => nil)
+      @cf = CurbFu::Response::Base.from_curb_response(mock_curb)
+      @cf.content_length.should == nil
+    end
+
+  end
+
 end

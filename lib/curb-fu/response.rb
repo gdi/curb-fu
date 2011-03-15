@@ -46,7 +46,24 @@ module CurbFu
       def to_hash
         { :status => status, :body => body, :headers => headers }
       end
-      
+
+      def content_length
+        if ( header_value = get_fields('Content-Length').to_a.last )
+          header_value.to_i
+        end
+      end
+
+      def content_type
+        if ( header_value = get_fields('Content-Type').to_a.last )
+          header_value.split(';').first
+        end
+      end
+
+      def get_fields(key)
+        @headers.find{|k,v| k.downcase == key.downcase}.to_a.last
+      end
+      alias_method :[], :get_fields
+
       def set_response_type(status)
         case status
         when 100..199 then
