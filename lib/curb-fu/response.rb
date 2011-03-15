@@ -35,7 +35,10 @@ module CurbFu
         header_lines.shift
         header_lines.inject({}) do |hsh, line|
           whole_enchillada, key, value = /^(.*?):\s*(.*)$/.match(line.chomp).to_a
-          hsh[key] = value unless whole_enchillada.nil?
+          unless whole_enchillada.nil?
+            # note: headers with multiple instances should have multiple values in the headers hash
+            hsh[key] = hsh[key] ? hsh[key].to_a << value : value
+          end
           hsh
         end
       end

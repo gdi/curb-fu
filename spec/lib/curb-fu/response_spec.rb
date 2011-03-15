@@ -106,6 +106,13 @@ describe CurbFu::Response::Base do
         @cf.headers['Content-Length'].should == '18'
         @cf.headers.keys.length.should == 5
       end
+
+      it "should use an array to store values for headers fields with multiple instances" do
+        headers = "HTTP/1.1 200 OK\r\nSet-Cookie: first cookie value\r\nSet-Cookie: second cookie value\r\n\r\n"
+        mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => headers, :timeout= => nil)
+        @cf = CurbFu::Response::Base.from_curb_response(mock_curb)
+        @cf.headers['Set-Cookie'].should == ["first cookie value", "second cookie value"]
+      end
     end
   end
 end
