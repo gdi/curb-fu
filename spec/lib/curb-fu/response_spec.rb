@@ -165,7 +165,7 @@ describe CurbFu::Response::Base do
 
   describe "content_length" do
 
-    it "should return the last content-length header field value" do
+    it "should return the last content-length header field value, as an integer" do
       headers = "HTTP/1.1 200 OK\r\nContent-Length: 100\r\nContent-Length: 18\r\n\r\n"
       mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => headers, :timeout= => nil)
       @cf = CurbFu::Response::Base.from_curb_response(mock_curb)
