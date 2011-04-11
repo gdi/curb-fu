@@ -126,14 +126,45 @@ describe CurbFu::Response::Base do
 
     it "should return an array containing all matching field values" do
       @cf.get_fields("Set-Cookie").should == ["first cookie value", "second cookie value"]
+      @cf.get_fields("Content-Length").should == ["18"]
     end
 
     it "should do a case-insensitive match of the key to header fields" do
-      @cf.get_fields("Set-cookie").should == ["first cookie value", "second cookie value"]
+      @cf.get_fields("content-length").should == ["18"]
+    end
+
+    it "should return empty array when key matches no header field" do
+      @cf.get_fields("non-existent").should == []
+    end
+
+  end
+
+  describe "[]" do
+
+    before(:each) do
+      headers = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=ISO-8859-1\r\nContent-Length: 18\r\nSet-Cookie: first cookie value\r\nServer: gws\r\nTransfer-Encoding: chunked\r\nSet-Cookie: second cookie value\r\n\r\n"
+      mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => headers, :timeout= => nil)
+      @cf = CurbFu::Response::Base.from_curb_response(mock_curb)
+    end
+
+    it "should return the last matching field value" do
+      @cf["Set-Cookie"].should == "second cookie value"
+    end
+
+    it "should return the entire header value" do
+      @cf["Content-Type"].should == "text/html; charset=ISO-8859-1"
+    end
+
+    it "should return the header value as a string" do
+      @cf["Content-Length"].should == "18"
+    end
+
+    it "should do a case-insensitive match of the key to header fields" do
+      @cf["content-length"].should == "18"
     end
 
     it "should return nil when key matches no header field" do
-      @cf.get_fields("non-existent").should == nil
+      @cf["non-existent"].should == nil
     end
 
   end
@@ -145,7 +176,7 @@ describe CurbFu::Response::Base do
       mock_curb = mock(Object, :response_code => 200, :body_str => 'OK', :header_str => headers, :timeout= => nil)
       @cf = CurbFu::Response::Base.from_curb_response(mock_curb)
       @cf.content_type.should == "text/html"
-    end    
+    end
 
     it "should return the content-type from the last header field value" do
       headers = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=ISO-8859-1\r\nContent-Length: 18\r\nContent-Type: application/xhtml+xml; charset=UTF-8\r\n\r\n"

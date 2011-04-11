@@ -60,9 +60,16 @@ module CurbFu
       end
 
       def get_fields(key)
-        @headers.find{|k,v| k.downcase == key.downcase}.to_a.last
+        if ( match = @headers.find{|k,v| k.downcase == key.downcase} )
+          [match.last].flatten
+        else
+          []
+        end
       end
-      alias_method :[], :get_fields
+
+      def [](key)
+        get_fields(key).last
+      end
 
       def set_response_type(status)
         case status
