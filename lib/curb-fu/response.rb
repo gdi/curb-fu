@@ -37,7 +37,7 @@ module CurbFu
           whole_enchillada, key, value = /^(.*?):\s*(.*)$/.match(line.chomp).to_a
           unless whole_enchillada.nil?
             # note: headers with multiple instances should have multiple values in the headers hash
-            hsh[key] = hsh[key] ? hsh[key].to_a << value : value
+            hsh[key] = hsh[key] ? [hsh[key]].flatten << value : value
           end
           hsh
         end
@@ -48,13 +48,13 @@ module CurbFu
       end
 
       def content_length
-        if ( header_value = get_fields('Content-Length').to_a.last )
+        if ( header_value = self['Content-Length'] )
           header_value.to_i
         end
       end
 
       def content_type
-        if ( header_value = get_fields('Content-Type').to_a.last )
+        if ( header_value = self['Content-Type'] )
           header_value.split(';').first
         end
       end
