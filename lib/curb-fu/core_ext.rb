@@ -1,19 +1,19 @@
 require 'cgi'
 
 ##
-# ActiveSupport look alike for to_param. Very useful.
+# ActiveSupport look alike for to_param_pair. Very useful.
 module CurbFu
   module HashExtensions
     def self.included(base)
-      base.send(:include, InstanceMethods) unless base.instance_methods.include?("to_param")
+      base.send(:include, InstanceMethods)
       #base.extend(ClassMethods)
     end
     
     module InstanceMethods
-      def to_param(prefix)
+      def to_param_pair(prefix)
         collect do |k, v|
           key_prefix = prefix ? "#{prefix}[#{k}]" : k
-          v.to_param(key_prefix)
+          v.to_param_pair(key_prefix)
         end.join("&")
       end
     end
@@ -21,12 +21,12 @@ module CurbFu
   
   module ObjectExtensions
     def self.included(base)
-      base.send(:include, InstanceMethods) unless base.instance_methods.include?("to_param")
+      base.send(:include, InstanceMethods)
       #base.extend(ClassMethods)
     end
     
     module InstanceMethods
-      def to_param(prefix = self.class)
+      def to_param_pair(prefix = self.class)
         value = CGI::escape(to_s)
         "#{prefix}=#{value}"
       end
@@ -35,14 +35,14 @@ module CurbFu
   
   module ArrayExtensions
     def self.included(base)
-      base.send(:include, InstanceMethods) unless base.instance_methods.include?("to_param")
+      base.send(:include, InstanceMethods)
       #base.extend(ClassMethods)
     end
     
     module InstanceMethods
-      def to_param(prefix)
+      def to_param_pair(prefix)
         prefix = "#{prefix}[]"
-        collect { |item| "#{item.to_param(prefix)}" }.join('&')
+        collect { |item| "#{item.to_param_pair(prefix)}" }.join('&')
       end
     end
   end

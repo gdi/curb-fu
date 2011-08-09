@@ -1,5 +1,4 @@
 require "rubygems"
-require 'spec'
 require 'htmlentities'
 
 dir = File.dirname(__FILE__)

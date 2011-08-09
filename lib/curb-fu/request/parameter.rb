@@ -9,7 +9,7 @@ module CurbFu
       end
       
       def self.build_uri_params(param_hash)
-        param_hash.to_param
+        param_hash.to_param_pair
       end
       
       def self.build_post_fields(param_hash)
@@ -17,11 +17,11 @@ module CurbFu
       end
       
       def to_uri_param
-        value.to_param(name)
+        value.to_param_pair(name)
       end
       
       def to_curl_post_field
-        field_string = value.to_param(name)
+        field_string = value.to_param_pair(name)
         fields = field_string.split('&').collect do |field_value_pair|
           field_name, field_value = field_value_pair.split('=')
           Curl::PostField.content(field_name, CGI::unescape(field_value))
