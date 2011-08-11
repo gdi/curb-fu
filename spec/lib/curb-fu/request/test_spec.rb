@@ -142,7 +142,7 @@ describe CurbFu::Request::Test do
       response = CurbFu::Request.get('http://a.example.com/gimme/html')
       response.should be_a_kind_of(CurbFu::Response::Base)
       response.status.should == 200
-      response.headers.should == { 'Content-Type' => 'spec/testcase' }
+      response.headers.should == { 'Content-Type' => 'spec/testcase', "Content-Length"=>"39" }
       response.body.should == "A is for Archer, an excellent typeface."
     end
   end
@@ -162,7 +162,7 @@ describe CurbFu::Request::Test do
       response = CurbFu::Request.post('http://a.example.com/gimme/html')
       response.should be_a_kind_of(CurbFu::Response::Base)
       response.status.should == 200
-      response.headers.should == { 'Content-Type' => 'spec/testcase' }
+      response.headers.should == { 'Content-Type' => 'spec/testcase', "Content-Length"=>"39" }
       response.body.should == "A is for Archer, an excellent typeface."
     end
   end
@@ -181,7 +181,7 @@ describe CurbFu::Request::Test do
       response = CurbFu::Request.post_file('http://a.example.com/gimme/html')
       response.should be_a_kind_of(CurbFu::Response::Base)
       response.status.should == 200
-      response.headers.should == { 'Content-Type' => 'spec/testcase' }
+      response.headers.should == { 'Content-Type' => 'spec/testcase', "Content-Length"=>"39" }
       response.body.should == "A is for Archer, an excellent typeface."
     end
   end
@@ -198,7 +198,7 @@ describe CurbFu::Request::Test do
       response = CurbFu::Request.put('http://a.example.com/gimme/html')
       response.should be_a_kind_of(CurbFu::Response::Base)
       response.status.should == 200
-      response.headers.should == { 'Content-Type' => 'spec/testcase' }
+      response.headers.should == { 'Content-Type' => 'spec/testcase', "Content-Length"=>"39" }
       response.body.should == "A is for Archer, an excellent typeface."
     end
   end
@@ -216,7 +216,7 @@ describe CurbFu::Request::Test do
       response = CurbFu::Request.delete('http://a.example.com/gimme/html')
       response.should be_a_kind_of(CurbFu::Response::Base)
       response.status.should == 200
-      response.headers.should == { 'Content-Type' => 'spec/testcase' }
+      response.headers.should == { 'Content-Type' => 'spec/testcase', "Content-Length"=>"39" }
       response.body.should == "A is for Archer, an excellent typeface."
     end
   end

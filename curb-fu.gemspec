@@ -11,4 +11,7 @@ spec = Gem::Specification.new do |s|
     s.has_rdoc  =   false
     s.add_dependency('curb',   '>= 0.5.4.0')
     s.add_dependency('rack-test',   '>= 0.2.0')
+    
+    s.add_development_dependency('rspec', '1.3.2')
+    s.add_development_dependency('htmlentities')
 end
