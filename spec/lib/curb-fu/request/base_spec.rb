@@ -74,6 +74,15 @@ describe CurbFu::Request::Base do
       Curl::Easy.should_receive(:new).with(regex_for_url_with_params('http://www.google.com', 'search=MSU\+vs\+UNC', 'limit=200')).and_return(@mock_curb)
       TestHarness.get('http://www.google.com', { :search => 'MSU vs UNC', :limit => 200 })
     end
+    it "should set cookies" do
+      the_cookies = "SekretAuth=123134234"
+      
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
+      Curl::Easy.should_receive(:new).and_return(@mock_curb)
+      @mock_curb.should_receive(:cookies=).with(the_cookies)
+      
+      TestHarness.get("http://google.com", {}, the_cookies)
+    end
 
     describe "with_hash" do
       it "should get google from {:host => \"www.google.com\", :port => 80}" do
@@ -93,6 +102,19 @@ describe CurbFu::Request::Base do
         @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
         Curl::Easy.should_receive(:new).with(regex_for_url_with_params('http://www.google.com', 'search=MSU\+vs\+UNC', 'limit=200')).and_return(@mock_curb)
         TestHarness.get({ :host => 'www.google.com' }, { :search => 'MSU vs UNC', :limit => 200 })
+      end
+      it "should set cookies" do
+        the_cookies = "SekretAuth=123134234"
+
+        @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil, :http_get => nil)
+        Curl::Easy.should_receive(:new).and_return(@mock_curb)
+        @mock_curb.should_receive(:cookies=).with(the_cookies)
+
+        TestHarness.get({
+          :host => "google.com",
+          :port => 80,
+          :cookies => the_cookies
+        })
       end
     end
   end

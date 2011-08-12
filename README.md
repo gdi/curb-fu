@@ -63,6 +63,22 @@ through their respective methods on CurbFu and CurbFu::Request.
 if you need https:
     
     response = CurbFu.post({:host => 'example.com', :path => '/some/resource', :protocol => "https"}, { :color => 'red', :shape => 'sphere' })
+    
+### Cookies; changes as of 0.6.1
+
+if you want to send a cookie, previous to 0.6.1 you have to pass a block to the HTTP verb method like so:
+
+    response = CurbFu.get("http://myhost.com") do |curb|
+      curb.cookies = "SekretToken=123234234235;"
+    end
+
+As of 0.6.1 one can set the cookies either as an optional final parameter or via a hash, e.g.:
+
+    response = CurbFu.get("http://myhost.com", { :param => "value" }, "SekretToken=123234;")
+    # or with a hash:
+    response = CurbFu.get({ :host => "http://myhost", :cookies => "SekretToken=1234;" })
+
+etc.
 
 Have fun!
 

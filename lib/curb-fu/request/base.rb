@@ -3,7 +3,7 @@ module CurbFu
     module Base
       include Common
       
-      def build(url_params, query_params = {}, &block)
+      def build(url_params, query_params = {}, cookies = nil, &block)
         curb = Curl::Easy.new(build_url(url_params, query_params))
 
         headers = global_headers
@@ -15,11 +15,14 @@ module CurbFu
           elsif url_params[:username]
             curb.http_auth_types = CurbFu::Authentication::BASIC
           end
-
+          
+          cookies ||= url_params[:cookies]
+          
           headers = headers.merge(url_params[:headers]) unless url_params[:headers].nil?
           headers["Expect"] = '' unless url_params[:headers] && url_params[:headers]["Expect"]
         end
         
+        curb.cookies = cookies if cookies
         curb.headers = headers
         curb.timeout = @timeout
 
@@ -40,23 +43,23 @@ module CurbFu
         @global_headers ||= {}
       end
       
-      def get(url, params = {}, &block)
-        curb = self.build(url, params, &block)
+      def get(url, params = {}, cookies = nil, &block)
+        curb = self.build(url, params, cookies, &block)
         curb.http_get
         CurbFu::Response::Base.from_curb_response(curb)
       end
 
-      def put(url, params = {}, &block)
+      def put(url, params = {}, cookies = nil, &block)
         curb = self.build(url, params, &block)
         curb.http_put("")
         CurbFu::Response::Base.from_curb_response(curb)
       end
 
-      def post(url, params = {}, &block)
+      def post(url, params = {}, cookies = nil, &block)
         fields = create_post_fields(params)
         fields = [fields] if fields.is_a?(String)
 
-        curb = self.build(url, &block)
+        curb = self.build(url, {}, cookies, &block)
         curb.http_post(*fields)
         response = CurbFu::Response::Base.from_curb_response(curb)
         if CurbFu.debug?
@@ -68,11 +71,11 @@ module CurbFu
         response
       end
 
-      def post_file(url, params = {}, filez = {}, &block)
+      def post_file(url, params = {}, filez = {}, cookies = nil, &block)
         fields = create_post_fields(params)
         fields += create_file_fields(filez)
 
-        curb = self.build(url, &block)
+        curb = self.build(url, {}, cookies, &block)
         curb.multipart_form_post = true
         
         begin
@@ -84,8 +87,8 @@ module CurbFu
         CurbFu::Response::Base.from_curb_response(curb)
       end
 
-      def delete(url, &block)
-        curb = self.build(url, &block)
+      def delete(url, cookies = nil, &block)
+        curb = self.build(url, cookies, &block)
         curb.http_delete
         CurbFu::Response::Base.from_curb_response(curb)
       end
