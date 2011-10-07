@@ -12,6 +12,8 @@ module CurbFu
       def build_url(url_params, query_params = {})
         if url_params.is_a? String
           built_url = url_params
+        elsif url_params[:url]
+          built_url = url_params[:url]
         else
           protocol = url_params[:protocol] || "http"
           built_url = "#{protocol}://#{url_params[:host]}"

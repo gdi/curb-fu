@@ -30,6 +30,9 @@ describe CurbFu::Request::Base do
     it "should return a string if a string parameter is given" do
       TestHarness.build_url("http://www.cliffsofinsanity.com").should == "http://www.cliffsofinsanity.com"
     end
+    it "should return a string if a :url paramter is given" do
+      TestHarness.build_url(:url => "http://www.cliffsofinsanity.com", :headers => { 'Content-Type' => 'cash/dollars' }).should == "http://www.cliffsofinsanity.com"
+    end
     it "should return a built url with just a hostname if only the hostname is given" do
       TestHarness.build_url(:host => "poisonedwine.com").should == "http://poisonedwine.com"
     end
