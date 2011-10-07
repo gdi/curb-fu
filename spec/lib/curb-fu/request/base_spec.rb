@@ -190,6 +190,22 @@ describe CurbFu::Request::Base do
     end
   end
   
+  describe "delete" do
+    before(:each) do
+      @resource_link = 'http://example.com/resource/1'
+      @mock_curb = mock(Curl::Easy, :headers= => nil, :headers => {}, :header_str => "", :response_code => 200, :body_str => 'yeeeah', :timeout= => nil)
+      Curl::Easy.stub!(:new).and_return(@mock_curb)
+    end
+
+    it "should send each parameter to Curb#http_delete" do
+      Curl::Easy.should_receive(:new).with(@resource_link).and_return(@mock_curb)
+      @mock_curb.should_receive(:http_delete)
+
+      response = TestHarness.delete(@resource_link)
+    end
+  end
+  
+  
   describe "create_post_fields" do
     it "should return the params if params is a string" do
       TestHarness.create_post_fields("my awesome data that I'm sending to you").
