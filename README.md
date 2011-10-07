@@ -33,7 +33,7 @@ however you feel best.
 
     $ gem install curb-fu --source http://gems.github.com
 
-Or, if you ahve the source:
+Or, if you have the source:
 
     $ cd <source-dir>
     $ rake gem
@@ -51,6 +51,11 @@ through their respective methods on CurbFu and CurbFu::Request.
 
     response = CurbFu.post('http://example.com/some/resource', { :color => 'red', :shape => 'sphere' })
     puts response.body unless response.success?
+
+If you need to pass custom headers, you can still pass a string URL with :url :
+
+    response = CurbFu.post(:url => 'http://example.com/some/resource', :headers => {'Content-Type' => 'application/xml'})
+
 
 ### Hash Examples
 
