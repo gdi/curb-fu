@@ -50,8 +50,11 @@ module CurbFu
       end
 
       def put(url, params = {}, cookies = nil, &block)
-        curb = self.build(url, params, &block)
-        curb.http_put("")
+        fields = create_post_fields(params)
+        fields = [fields] if fields.is_a?(String)
+
+        curb = self.build(url, {}, cookies, &block)
+        curb.http_put(*fields)
         CurbFu::Response::Base.from_curb_response(curb)
       end
 
