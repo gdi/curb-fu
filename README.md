@@ -102,6 +102,7 @@ Have fun!
 
 * thickpaddy (https://github.com/thickpaddy)
 * hoverlover (https://github.com/hoverlover)
+* whatcould (https://github.com/whatcould)
 
 ## Original Authorship
 
