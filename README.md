@@ -25,7 +25,7 @@ however you feel best.
 
 ## Prerequisites
 
-* Ruby (tested on 1.8.7, 1.9.1)
+* Ruby (tested on 1.8.7, 1.9.x)
 * The Curb gem (and its libcurl dependency)
   * http://github.com/taf2/curb
 
