@@ -109,7 +109,7 @@ module CurbFu
         
         def get_interface(url)
           if url.is_a?(Hash)
-            host = url[:host]
+            host = url[:host] || parse_hostname(url[:url])
           else
             host = parse_hostname(url)
           end
