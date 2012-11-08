@@ -1,10 +1,8 @@
-require "rubygems"
+require 'rspec'
+require 'curb-fu'
 require 'htmlentities'
 
-dir = File.dirname(__FILE__)
-lib_path = File.expand_path(File.join(dir,'..','lib'))
-$LOAD_PATH.unshift lib_path unless $LOAD_PATH.include?(lib_path)
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
-Dir.glob(File.join(dir,'helpers','**','*')).each { |helper| require helper }
-
-require 'curb-fu'
+RSpec.configure do |config|
+end
