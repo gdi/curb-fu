@@ -13,7 +13,7 @@ This gem is released under the terms of the Ruby license.  See the LICENSE file 
 If you are POSTing data and curb seems to be locking up, try posting it with an explicit 'Expect: 100-continue' header.
 
 You can set this per-request, e.g.
-    
+
     CurbFu.post({:host => 'example.com', :headers => { "Expect" => "100-continue" }}, { "data" => "here" })
 
 or you can configure it as a global header, e.g.
@@ -41,8 +41,8 @@ Or, if you have the source:
 
 ## Examples
 
-Urls can be requested using hashes of options or strings.  The GET, POST, PUT, and DELETE methods are supported 
-through their respective methods on CurbFu and CurbFu::Request. 
+Urls can be requested using hashes of options or strings.  The GET, POST, PUT, and DELETE methods are supported
+through their respective methods on CurbFu and CurbFu::Request.
 
 ### String Examples
 
@@ -66,9 +66,9 @@ If you need to pass custom headers, you can still pass a string URL with :url :
     puts response.body unless response.success?
 
 if you need https:
-    
+
     response = CurbFu.post({:host => 'example.com', :path => '/some/resource', :protocol => "https"}, { :color => 'red', :shape => 'sphere' })
-    
+
 ### Cookies; changes as of 0.6.1
 
 if you want to send a cookie, previous to 0.6.1 you have to pass a block to the HTTP verb method like so:
@@ -84,6 +84,16 @@ As of 0.6.1 one can set the cookies either as an optional final parameter or via
     response = CurbFu.get({ :host => "http://myhost", :cookies => "SekretToken=1234;" })
 
 etc.
+
+### Following Redirects, and other advanced topics
+
+you can pass a block to the CurbFu methods, we will yield the Curl::Easy object to this block to allow you to reach as far into the Curb guts as you want. This is particularly useful if you want to follow redirects:
+
+```ruby
+resp = CurbFu.get('http://google.com') { |curb| curb.follow_location = true }
+```
+
+**n.b.** we would happily entertain pull requests to add some sugar to common configuration items.
 
 Have fun!
 
