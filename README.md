@@ -1,6 +1,6 @@
 # curb-fu - easy-to-use wrapper around curb - the ruby wrapper around libcurl
 
-* http://github.com/curb-fu
+* https://github.com/gdi/curb-fu
 
 Curb can be found at http://github.com/taf2/curb
 
